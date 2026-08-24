@@ -198,11 +198,7 @@ export function Chat() {
       <div className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-6 sm:px-6">
         {error ? (
           <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-destructive text-sm">
-            {error.message.includes("API key") ||
-            error.message.includes("401") ||
-            error.message.includes("Unauthorized")
-              ? "尚未配置 AI Gateway。请在项目根目录创建 .env.local，写入 AI_GATEWAY_API_KEY 后重启。"
-              : error.message}
+            {error.message}
           </p>
         ) : null}
 
