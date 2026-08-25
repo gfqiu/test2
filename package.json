@@ -1,0 +1,12 @@
+{
+  "name": "snake-game",
+  "version": "1.0.0",
+  "description": "浏览器贪吃蛇小游戏",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "npx --yes serve . -p 3000"
+  },
+  "keywords": ["snake", "game"],
+  "license": "MIT"
+}

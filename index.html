@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>贪吃蛇</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="stage">
+      <header class="top">
+        <h1 class="brand">贪吃蛇</h1>
+        <p class="hint">方向键或 WASD 移动 · 空格暂停</p>
+      </header>
+
+      <section class="board-wrap" aria-label="游戏区域">
+        <canvas id="board" width="480" height="480" role="img" aria-label="蛇与食物"></canvas>
+        <div id="overlay" class="overlay" hidden>
+          <p id="overlay-title">暂停</p>
+          <button type="button" id="overlay-btn">继续</button>
+        </div>
+      </section>
+
+      <footer class="hud">
+        <p>得分 <strong id="score">0</strong></p>
+        <button type="button" id="restart">重新开始</button>
+      </footer>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
