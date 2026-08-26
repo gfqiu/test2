@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星河 · 智慧运营数据指挥中心</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+    :root {
+      --bg-deep: #050b16;
+      --bg-panel: rgba(8, 22, 42, 0.72);
+      --line: rgba(56, 189, 248, 0.28);
+      --cyan: #22d3ee;
+      --mint: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --text: #e8f4ff;
+      --muted: #8ba3b8;
+      --glow: 0 0 24px rgba(34, 211, 238, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(14, 116, 144, 0.35), transparent 55%),
+        radial-gradient(ellipse 40% 40% at 10% 80%, rgba(6, 78, 110, 0.25), transparent 50%),
+        radial-gradient(ellipse 40% 40% at 90% 70%, rgba(4, 47, 76, 0.3), transparent 50%),
+        linear-gradient(180deg, #04101f 0%, #050b16 40%, #071525 100%);
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      width: 100vw;
+      height: 100vh;
+      padding: 12px 18px 16px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+    }
+
+    /* Header */
+    .header {
+      position: relative;
+      height: 72px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header::before,
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      width: 28%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    }
+    .header::before { left: 0; }
+    .header::after { right: 0; }
+
+    .header-side {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .header-side.right { justify-content: flex-end; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      background: rgba(34, 211, 238, 0.06);
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    }
+    .chip .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 8px var(--mint);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    .brand {
+      text-align: center;
+      position: relative;
+    }
+    .brand h1 {
+      font-family: "Orbitron", "Noto Sans SC", sans-serif;
+      font-size: clamp(22px, 2.4vw, 34px);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      background: linear-gradient(180deg, #fff 20%, #67e8f9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 40px rgba(34, 211, 238, 0.35);
+      animation: titleIn 1s ease-out;
+    }
+    .brand .sub {
+      margin-top: 2px;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      color: var(--cyan);
+      opacity: 0.75;
+    }
+
+    /* Layout */
+    .main {
+      display: grid;
+      grid-template-columns: 26% 1fr 26%;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .col {
+      display: grid;
+      gap: 12px;
+      min-height: 0;
+    }
+    .col.left { grid-template-rows: 1.1fr 1fr 1fr; }
+    .col.center { grid-template-rows: auto 1.35fr 1fr; }
+    .col.right { grid-template-rows: 1.1fr 1fr 1fr; }
+
+    .panel {
+      position: relative;
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+      padding: 12px 14px 10px;
+      overflow: hidden;
+      animation: panelIn 0.7s ease-out both;
+    }
+    .col.left .panel:nth-child(1) { animation-delay: 0.05s; }
+    .col.left .panel:nth-child(2) { animation-delay: 0.15s; }
+    .col.left .panel:nth-child(3) { animation-delay: 0.25s; }
+    .col.center .panel:nth-child(1) { animation-delay: 0.1s; }
+    .col.center .panel:nth-child(2) { animation-delay: 0.2s; }
+    .col.center .panel:nth-child(3) { animation-delay: 0.3s; }
+    .col.right .panel:nth-child(1) { animation-delay: 0.12s; }
+    .col.right .panel:nth-child(2) { animation-delay: 0.22s; }
+    .col.right .panel:nth-child(3) { animation-delay: 0.32s; }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(34,211,238,0.6), transparent);
+    }
+    .corner {
+      position: absolute;
+      width: 10px; height: 10px;
+      border: 1.5px solid var(--cyan);
+      opacity: 0.7;
+    }
+    .corner.tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+    .corner.tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; }
+    .corner.bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; }
+    .corner.br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+    .panel-title span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-title span::before {
+      content: "";
+      width: 3px; height: 14px;
+      background: linear-gradient(180deg, var(--cyan), transparent);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+    .panel-title small {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    .chart-box {
+      width: 100%;
+      height: calc(100% - 28px);
+      min-height: 100px;
+      position: relative;
+    }
+
+    /* KPI strip */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .kpi {
+      position: relative;
+      padding: 14px 12px;
+      background: linear-gradient(135deg, rgba(8,30,55,0.9), rgba(6,20,40,0.7));
+      border: 1px solid var(--line);
+      text-align: center;
+      overflow: hidden;
+    }
+    .kpi::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -40% -20%;
+      height: 60%;
+      background: radial-gradient(ellipse, rgba(34,211,238,0.12), transparent 70%);
+    }
+    .kpi .label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .kpi .value {
+      font-family: "Orbitron", sans-serif;
+      font-size: clamp(20px, 2vw, 28px);
+      font-weight: 700;
+      color: var(--cyan);
+      text-shadow: var(--glow);
+    }
+    .kpi .delta {
+      margin-top: 4px;
+      font-size: 11px;
+    }
+    .kpi .delta.up { color: var(--mint); }
+    .kpi .delta.down { color: var(--rose); }
+
+    /* Center map area */
+    .map-stage {
+      position: relative;
+      height: 100%;
+      display: grid;
+      place-items: center;
+    }
+    .orbit {
+      position: absolute;
+      border: 1px dashed rgba(34, 211, 238, 0.2);
+      border-radius: 50%;
+      animation: spin 40s linear infinite;
+    }
+    .orbit.o1 { width: 62%; aspect-ratio: 1; }
+    .orbit.o2 { width: 78%; aspect-ratio: 1; animation-direction: reverse; animation-duration: 55s; }
+    .orbit.o3 { width: 92%; aspect-ratio: 1; animation-duration: 70s; }
+
+    .core {
+      position: relative;
+      width: min(42%, 220px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(103,232,249,0.35), transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(14,116,144,0.5), rgba(5,11,22,0.9) 70%);
+      border: 1px solid rgba(34, 211, 238, 0.45);
+      box-shadow: 0 0 40px rgba(34,211,238,0.2), inset 0 0 30px rgba(34,211,238,0.15);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      animation: breathe 3.5s ease-in-out infinite;
+    }
+    .core .big {
+      font-family: "Orbitron", sans-serif;
+      font-size: clamp(28px, 3vw, 42px);
+      color: #fff;
+      line-height: 1;
+    }
+    .core .cap {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+    }
+
+    .node {
+      position: absolute;
+      padding: 6px 10px;
+      font-size: 11px;
+      background: rgba(8, 22, 42, 0.85);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      white-space: nowrap;
+      animation: floatY 4s ease-in-out infinite;
+    }
+    .node strong {
+      display: block;
+      color: var(--cyan);
+      font-family: "Orbitron", sans-serif;
+      font-size: 13px;
+    }
+    .node.n1 { top: 12%; left: 18%; animation-delay: 0s; }
+    .node.n2 { top: 18%; right: 14%; animation-delay: 0.6s; }
+    .node.n3 { bottom: 16%; left: 12%; animation-delay: 1.2s; }
+    .node.n4 { bottom: 12%; right: 16%; animation-delay: 1.8s; }
+
+    /* Rank list */
+    .rank-list { display: flex; flex-direction: column; gap: 8px; height: calc(100% - 28px); justify-content: space-around; }
+    .rank-item {
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+    }
+    .rank-item .idx {
+      width: 20px; height: 20px;
+      display: grid; place-items: center;
+      font-family: "Orbitron", sans-serif;
+      font-size: 11px;
+      background: rgba(34,211,238,0.12);
+      border: 1px solid var(--line);
+      color: var(--cyan);
+    }
+    .rank-item:nth-child(1) .idx { background: rgba(251,191,36,0.2); border-color: var(--amber); color: var(--amber); }
+    .rank-item:nth-child(2) .idx { background: rgba(148,163,184,0.2); border-color: #94a3b8; color: #cbd5e1; }
+    .rank-item:nth-child(3) .idx { background: rgba(251,113,133,0.15); border-color: var(--rose); color: var(--rose); }
+    .bar-track {
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, rgba(34,211,238,0.3), var(--cyan));
+      transform-origin: left;
+      animation: growBar 1.2s ease-out both;
+    }
+
+    .alert-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: calc(100% - 28px);
+      overflow: hidden;
+    }
+    .alert {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.03);
+      border-left: 2px solid var(--cyan);
+      font-size: 12px;
+      animation: slideIn 0.5s ease-out;
+    }
+    .alert.warn { border-left-color: var(--amber); }
+    .alert.crit { border-left-color: var(--rose); }
+    .alert .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border: 1px solid currentColor;
+      opacity: 0.85;
+    }
+    .alert.ok .tag { color: var(--mint); }
+    .alert.warn .tag { color: var(--amber); }
+    .alert.crit .tag { color: var(--rose); }
+    .alert .time { color: var(--muted); font-size: 11px; }
+
+    canvas { width: 100% !important; height: 100% !important; display: block; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes breathe {
+      0%, 100% { box-shadow: 0 0 30px rgba(34,211,238,0.18), inset 0 0 24px rgba(34,211,238,0.12); }
+      50% { box-shadow: 0 0 55px rgba(34,211,238,0.35), inset 0 0 36px rgba(34,211,238,0.2); }
+    }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes growBar {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes titleIn {
+      from { opacity: 0; letter-spacing: 0.4em; }
+      to { opacity: 1; letter-spacing: 0.12em; }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @media (max-width: 1100px) {
+      body { overflow: auto; }
+      .screen { height: auto; min-height: 100vh; }
+      .main { grid-template-columns: 1fr; }
+      .col.left, .col.right, .col.center { grid-template-rows: none; }
+      .chart-box { height: 200px; }
+      .map-stage { min-height: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="screen">
+    <header class="header">
+      <div class="header-side">
+        <div class="chip"><span class="dot"></span>系统运行正常</div>
+        <div class="chip">数据源 · 实时同步</div>
+      </div>
+      <div class="brand">
+        <h1>星河 · 智慧运营指挥中心</h1>
+        <div class="sub">STAR RIVER OPERATIONS COMMAND</div>
+      </div>
+      <div class="header-side right">
+        <div class="chip" id="clock">--</div>
+        <div class="chip">刷新 · <span id="tick">3</span>s</div>
+      </div>
+    </header>
+
+    <div class="main">
+      <!-- Left -->
+      <div class="col left">
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>业务趋势概览</span><small>近 12 个月</small></div>
+          <div class="chart-box"><canvas id="cTrend"></canvas></div>
+        </section>
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>渠道结构占比</span><small>本月</small></div>
+          <div class="chart-box"><canvas id="cPie"></canvas></div>
+        </section>
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>区域效能雷达</span><small>六维评估</small></div>
+          <div class="chart-box"><canvas id="cRadar"></canvas></div>
+        </section>
+      </div>
+
+      <!-- Center -->
+      <div class="col center">
+        <section class="panel kpis" style="padding: 10px; display: grid;">
+          <div class="kpi">
+            <div class="label">今日成交额</div>
+            <div class="value" data-count="1286.4">0</div>
+            <div class="delta up">▲ 12.6%</div>
+          </div>
+          <div class="kpi">
+            <div class="label">活跃用户</div>
+            <div class="value" data-count="86420">0</div>
+            <div class="delta up">▲ 8.3%</div>
+          </div>
+          <div class="kpi">
+            <div class="label">订单完成率</div>
+            <div class="value" data-count="97.2" data-suffix="%">0</div>
+            <div class="delta up">▲ 1.1%</div>
+          </div>
+          <div class="kpi">
+            <div class="label">平均响应</div>
+            <div class="value" data-count="1.8" data-suffix="s">0</div>
+            <div class="delta down">▼ 0.3s</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>全国业务热力枢纽</span><small>实时流量</small></div>
+          <div class="chart-box map-stage">
+            <div class="orbit o1"></div>
+            <div class="orbit o2"></div>
+            <div class="orbit o3"></div>
+            <div class="node n1"><strong id="n1v">32.4%</strong>华东枢纽</div>
+            <div class="node n2"><strong id="n2v">24.1%</strong>华南枢纽</div>
+            <div class="node n3"><strong id="n3v">18.7%</strong>华北枢纽</div>
+            <div class="node n4"><strong id="n4v">14.2%</strong>西南枢纽</div>
+            <div class="core">
+              <div>
+                <div class="big" id=" thr">0</div>
+                <div class="cap">今日吞吐 · 万笔</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>订单与转化双轴</span><small>近 24 小时</small></div>
+          <div class="chart-box"><canvas id="cBarLine"></canvas></div>
+        </section>
+      </div>
+
+      <!-- Right -->
+      <div class="col right">
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>城市排行 TOP5</span><small>成交贡献</small></div>
+          <div class="rank-list" id="rankList"></div>
+        </section>
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>资源利用率</span><small>集群监控</small></div>
+          <div class="chart-box"><canvas id="cGauge"></canvas></div>
+        </section>
+        <section class="panel">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="panel-title"><span>事件告警流</span><small>实时</small></div>
+          <div class="alert-feed" id="alerts"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========== Utils ========== */
+    const $ = (s) => document.querySelector(s);
+    const cyan = "#22d3ee";
+    const mint = "#34d399";
+    const amber = "#fbbf24";
+    const muted = "rgba(139,163,184,0.55)";
+
+    function fitCanvas(c) {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = c.parentElement.getBoundingClientRect();
+      c.width = Math.max(1, Math.floor(r.width * dpr));
+      c.height = Math.max(1, Math.floor(r.height * dpr));
+      const ctx = c.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w: r.width, h: r.height };
+    }
+
+    function animateCount(el, target, duration = 1400) {
+      const suffix = el.dataset.suffix || "";
+      const isFloat = String(target).includes(".");
+      const start = performance.now();
+      function frame(t) {
+        const p = Math.min(1, (t - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const v = target * eased;
+        el.textContent = (isFloat ? v.toFixed(1) : Math.round(v).toLocaleString()) + suffix;
+        if (p < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    /* ========== Clock ========== */
+    function updateClock() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      $("#clock").textContent =
+        `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ========== Charts ========== */
+    function drawTrend() {
+      const c = $("#cTrend");
+      const { ctx, w, h } = fitCanvas(c);
+      const pad = { t: 16, r: 12, b: 28, l: 36 };
+      const months = ["1","2","3","4","5","6","7","8","9","10","11","12"];
+      const a = [42,48,45,58,62,70,68,75,82,88,94,108];
+      const b = [28,32,36,34,40,48,52,55,60,66,72,80];
+      const max = 120;
+      const iw = w - pad.l - pad.r;
+      const ih = h - pad.t - pad.b;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = muted;
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.t + (ih * i) / 4;
+        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+        ctx.fillStyle = muted;
+        ctx.font = "10px sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(String(Math.round(max - (max * i) / 4)), pad.l - 6, y + 3);
+      }
+
+      function path(data, color, fill) {
+        ctx.beginPath();
+        data.forEach((v, i) => {
+          const x = pad.l + (iw * i) / (data.length - 1);
+          const y = pad.t + ih * (1 - v / max);
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        if (fill) {
+          ctx.lineTo(pad.l + iw, pad.t + ih);
+          ctx.lineTo(pad.l, pad.t + ih);
+          ctx.closePath();
+          const g = ctx.createLinearGradient(0, pad.t, 0, pad.t + ih);
+          g.addColorStop(0, fill);
+          g.addColorStop(1, "transparent");
+          ctx.fillStyle = g;
+          ctx.fill();
+        }
+      }
+      path(a, cyan, "rgba(34,211,238,0.25)");
+      path(b, mint, null);
+
+      months.forEach((m, i) => {
+        const x = pad.l + (iw * i) / (months.length - 1);
+        ctx.fillStyle = muted;
+        ctx.font = "10px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(m + "月", x, h - 8);
+      });
+    }
+
+    function drawPie() {
+      const c = $("#cPie");
+      const { ctx, w, h } = fitCanvas(c);
+      const data = [
+        { name: "线上直营", v: 38, color: cyan },
+        { name: "合作伙伴", v: 26, color: mint },
+        { name: "线下门店", v: 20, color: amber },
+        { name: "生态开放", v: 16, color: "#818cf8" },
+      ];
+      const total = data.reduce((s, d) => s + d.v, 0);
+      const cx = w * 0.38, cy = h * 0.5;
+      const r = Math.min(w, h) * 0.32;
+      let ang = -Math.PI / 2;
+      ctx.clearRect(0, 0, w, h);
+
+      // ring bg
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      ctx.lineWidth = r * 0.35;
+      ctx.stroke();
+
+      data.forEach((d) => {
+        const slice = (d.v / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, ang, ang + slice);
+        ctx.strokeStyle = d.color;
+        ctx.lineWidth = r * 0.32;
+        ctx.lineCap = "butt";
+        ctx.stroke();
+        ang += slice;
+      });
+
+      ctx.fillStyle = "#e8f4ff";
+      ctx.font = "bold 18px Orbitron, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("100%", cx, cy + 2);
+      ctx.font = "10px sans-serif";
+      ctx.fillStyle = muted;
+      ctx.fillText("全渠道", cx, cy + 16);
+
+      data.forEach((d, i) => {
+        const y = h * 0.22 + i * 22;
+        const x = w * 0.68;
+        ctx.fillStyle = d.color;
+        ctx.fillRect(x, y, 8, 8);
+        ctx.fillStyle = "#e8f4ff";
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`${d.name}  ${d.v}%`, x + 14, y + 8);
+      });
+    }
+
+    function drawRadar() {
+      const c = $("#cRadar");
+      const { ctx, w, h } = fitCanvas(c);
+      const labels = ["效率", "质量", "成本", "体验", "安全", "增长"];
+      const vals = [0.86, 0.78, 0.72, 0.91, 0.88, 0.8];
+      const cx = w / 2, cy = h / 2 + 4;
+      const R = Math.min(w, h) * 0.34;
+      const n = labels.length;
+      ctx.clearRect(0, 0, w, h);
+
+      for (let level = 1; level <= 4; level++) {
+        ctx.beginPath();
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+          const r = (R * level) / 4;
+          const x = cx + Math.cos(a) * r;
+          const y = cy + Math.sin(a) * r;
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = "rgba(34,211,238,0.15)";
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      vals.forEach((v, i) => {
+        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+        const x = cx + Math.cos(a) * R * v;
+        const y = cy + Math.sin(a) * R * v;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = "rgba(34,211,238,0.2)";
+      ctx.fill();
+      ctx.strokeStyle = cyan;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      labels.forEach((lab, i) => {
+        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+        const x = cx + Math.cos(a) * (R + 16);
+        const y = cy + Math.sin(a) * (R + 16);
+        ctx.fillStyle = muted;
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(lab, x, y);
+      });
+    }
+
+    function drawBarLine() {
+      const c = $("#cBarLine");
+      const { ctx, w, h } = fitCanvas(c);
+      const pad = { t: 18, r: 36, b: 24, l: 36 };
+      const hours = Array.from({ length: 12 }, (_, i) => `${i * 2}:00`);
+      const orders = [120, 180, 150, 220, 310, 280, 350, 420, 390, 450, 410, 480];
+      const conv = [2.1, 2.4, 2.2, 2.8, 3.1, 2.9, 3.4, 3.8, 3.5, 4.0, 3.7, 4.2];
+      const iw = w - pad.l - pad.r;
+      const ih = h - pad.t - pad.b;
+      const maxO = 500, maxC = 5;
+      ctx.clearRect(0, 0, w, h);
+
+      const bw = (iw / orders.length) * 0.55;
+      orders.forEach((v, i) => {
+        const x = pad.l + (iw * (i + 0.5)) / orders.length - bw / 2;
+        const bh = (v / maxO) * ih;
+        const g = ctx.createLinearGradient(0, pad.t + ih - bh, 0, pad.t + ih);
+        g.addColorStop(0, "rgba(34,211,238,0.85)");
+        g.addColorStop(1, "rgba(34,211,238,0.15)");
+        ctx.fillStyle = g;
+        ctx.fillRect(x, pad.t + ih - bh, bw, bh);
+      });
+
+      ctx.beginPath();
+      conv.forEach((v, i) => {
+        const x = pad.l + (iw * (i + 0.5)) / conv.length;
+        const y = pad.t + ih * (1 - v / maxC);
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      });
+      ctx.strokeStyle = amber;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      conv.forEach((v, i) => {
+        const x = pad.l + (iw * (i + 0.5)) / conv.length;
+        const y = pad.t + ih * (1 - v / maxC);
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = amber;
+        ctx.fill();
+      });
+
+      hours.forEach((lab, i) => {
+        if (i % 2) return;
+        const x = pad.l + (iw * (i + 0.5)) / hours.length;
+        ctx.fillStyle = muted;
+        ctx.font = "10px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(lab, x, h - 6);
+      });
+    }
+
+    function drawGauge() {
+      const c = $("#cGauge");
+      const { ctx, w, h } = fitCanvas(c);
+      const items = [
+        { name: "CPU", v: 0.68, color: cyan },
+        { name: "内存", v: 0.74, color: mint },
+        { name: "存储", v: 0.52, color: amber },
+        { name: "带宽", v: 0.61, color: "#818cf8" },
+      ];
+      ctx.clearRect(0, 0, w, h);
+      const cols = 2, rows = 2;
+      items.forEach((it, i) => {
+        const col = i % cols, row = Math.floor(i / cols);
+        const cw = w / cols, ch = h / rows;
+        const cx = col * cw + cw / 2;
+        const cy = row * ch + ch / 2 + 4;
+        const R = Math.min(cw, ch) * 0.28;
+        const start = Math.PI * 0.75;
+        const end = Math.PI * 2.25;
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, start, end);
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.lineWidth = 8;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, start, start + (end - start) * it.v);
+        ctx.strokeStyle = it.color;
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        ctx.fillStyle = "#e8f4ff";
+        ctx.font = "bold 14px Orbitron, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(Math.round(it.v * 100) + "%", cx, cy + 2);
+        ctx.font = "11px sans-serif";
+        ctx.fillStyle = muted;
+        ctx.fillText(it.name, cx, cy + R + 16);
+      });
+    }
+
+    /* ========== Rank & Alerts ========== */
+    const cities = [
+      { name: "上海", v: 96 },
+      { name: "深圳", v: 88 },
+      { name: "杭州", v: 81 },
+      { name: "北京", v: 76 },
+      { name: "成都", v: 69 },
+    ];
+    function renderRank() {
+      $("#rankList").innerHTML = cities.map((c, i) => `
+        <div class="rank-item">
+          <div class="idx">${i + 1}</div>
+          <div>
+            <div>${c.name}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${c.v}%;animation-delay:${i*0.1}s"></div></div>
+          </div>
+          <div style="font-family:Orbitron,sans-serif;color:var(--cyan)">${c.v}</div>
+        </div>
+      `).join("");
+    }
+
+    const alertPool = [
+      { cls: "ok", tag: "正常", text: "华东集群扩容完成，容量 +18%" },
+      { cls: "warn", tag: "预警", text: "华南网关延迟升高至 210ms" },
+      { cls: "ok", tag: "同步", text: "订单中心与库存系统对账成功" },
+      { cls: "crit", tag: "告警", text: "支付通道 B 失败率超阈值" },
+      { cls: "ok", tag: "部署", text: "风控模型 v3.2 灰度发布 20%" },
+      { cls: "warn", tag: "容量", text: "对象存储使用率达到 78%" },
+    ];
+    let alertIdx = 0;
+    function renderAlerts() {
+      const items = [];
+      for (let i = 0; i < 4; i++) {
+        const a = alertPool[(alertIdx + i) % alertPool.length];
+        const t = new Date(Date.now() - i * 47000);
+        const pad = (n) => String(n).padStart(2, "0");
+        items.push(`
+          <div class="alert ${a.cls}">
+            <span class="tag">${a.tag}</span>
+            <span>${a.text}</span>
+            <span class="time">${pad(t.getHours())}:${pad(t.getMinutes())}</span>
+          </div>
+        `);
+      }
+      $("#alerts").innerHTML = items.join("");
+      alertIdx = (alertIdx + 1) % alertPool.length;
+    }
+
+    /* ========== Live numbers ========== */
+    function tickLive() {
+      const thr = 186 + Math.random() * 12;
+      animateCount($("#thr"), thr, 600);
+      ["n1v","n2v","n3v","n4v"].forEach((id, i) => {
+        const base = [32.4, 24.1, 18.7, 14.2][i];
+        $(`#${id}`).textContent = (base + (Math.random() - 0.5) * 1.2).toFixed(1) + "%";
+      });
+    }
+
+    function drawAll() {
+      drawTrend(); drawPie(); drawRadar(); drawBarLine(); drawGauge();
+    }
+
+    function boot() {
+      renderRank();
+      renderAlerts();
+      drawAll();
+      document.querySelectorAll(".kpi .value").forEach((el) => {
+        animateCount(el, parseFloat(el.dataset.count));
+      });
+      animateCount($("#thr"), 192.6);
+
+      let sec = 3;
+      setInterval(() => {
+        sec -= 1;
+        if (sec <= 0) {
+          sec = 3;
+          tickLive();
+          renderAlerts();
+          // slight data jitter on gauges
+          drawGauge();
+        }
+        $("#tick").textContent = sec;
+      }, 1000);
+    }
+
+    window.addEventListener("resize", () => {
+      clearTimeout(window.__rz);
+      window.__rz = setTimeout(drawAll, 120);
+    });
+
+    boot();
+  </script>
+</body>
+</html>
