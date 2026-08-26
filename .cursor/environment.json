@@ -1,0 +1,14 @@
+{
+  "name": "青澜门户 (Qinglan Portal)",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "dev server",
+      "command": "npm run dev -- --host 0.0.0.0 --port 5173",
+      "description": "Vite dev server for the Qinglan Portal, served at http://localhost:5173"
+    }
+  ],
+  "ports": [
+    { "name": "web", "port": 5173 }
+  ]
+}
