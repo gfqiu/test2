@@ -1,0 +1,9 @@
+{
+  "name": "aurora-epoch-presentation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "极光纪元 · 静态 HTML 演示文稿",
+  "scripts": {
+    "test": "node test/presentation.test.js"
+  }
+}
