@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>学生管理系统</title>
+  <style>
+    :root {
+      --bg: #0f1a24;
+      --panel: #162533;
+      --line: #2a3d4f;
+      --text: #e8f0f6;
+      --muted: #8aa0b3;
+      --accent: #2db88a;
+      --accent-hover: #249e76;
+      --danger: #e06b6b;
+      --danger-hover: #c95555;
+      --warn: #d4a017;
+      --input: #0c141c;
+      --focus: #3ecf9a;
+      --radius: 10px;
+      --font: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #1d3a4a 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #1a4036 0%, transparent 50%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px 16px 48px;
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    .panel {
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(6px);
+    }
+
+    .panel h2 {
+      font-size: 1.05rem;
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 14px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    label.full { grid-column: 1 / -1; }
+
+    input, select {
+      background: var(--input);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 25%, transparent);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button:active { transform: translateY(1px); }
+
+    .btn-primary { background: var(--accent); color: #062218; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #243746; color: var(--text); }
+    .btn-secondary:hover { background: #2d4558; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-warn { background: var(--warn); color: #1a1400; }
+    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .toolbar input {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      min-width: 640px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      background: #1a2d3d;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: color-mix(in srgb, #1f3648 70%, transparent); }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 28px 12px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #1e3344;
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 20;
+      max-width: min(320px, calc(100vw - 36px));
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      label.full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>学生管理系统</h1>
+      <p>本地浏览器保存，支持增删改查与搜索。</p>
+    </header>
+
+    <section class="panel">
+      <h2 id="formTitle">添加学生</h2>
+      <form id="studentForm">
+        <input type="hidden" id="editId" />
+        <div class="form-grid">
+          <label>
+            学号
+            <input id="studentId" name="studentId" required maxlength="32" placeholder="如 2024001" autocomplete="off" />
+          </label>
+          <label>
+            姓名
+            <input id="name" name="name" required maxlength="40" placeholder="学生姓名" autocomplete="off" />
+          </label>
+          <label>
+            性别
+            <select id="gender" name="gender" required>
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+          </label>
+          <label>
+            班级
+            <input id="klass" name="klass" required maxlength="40" placeholder="如 计科2401" autocomplete="off" />
+          </label>
+          <label>
+            年龄
+            <input id="age" name="age" type="number" min="6" max="100" required placeholder="18" />
+          </label>
+          <label>
+            电话
+            <input id="phone" name="phone" maxlength="20" placeholder="选填" autocomplete="off" />
+          </label>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn-primary" id="submitBtn">添加</button>
+          <button type="button" class="btn-secondary" id="resetBtn">清空</button>
+          <button type="button" class="btn-warn" id="cancelEditBtn" hidden>取消编辑</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>学生列表</h2>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="搜索学号 / 姓名 / 班级 / 电话" />
+        <span class="count" id="countLabel">共 0 人</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>学号</th>
+              <th>姓名</th>
+              <th>性别</th>
+              <th>班级</th>
+              <th>年龄</th>
+              <th>电话</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const STORAGE_KEY = "student_mgmt_v1";
+
+    /** @typedef {{ id: string, studentId: string, name: string, gender: string, klass: string, age: number, phone: string }} Student */
+
+    const els = {
+      form: document.getElementById("studentForm"),
+      formTitle: document.getElementById("formTitle"),
+      editId: document.getElementById("editId"),
+      studentId: document.getElementById("studentId"),
+      name: document.getElementById("name"),
+      gender: document.getElementById("gender"),
+      klass: document.getElementById("klass"),
+      age: document.getElementById("age"),
+      phone: document.getElementById("phone"),
+      submitBtn: document.getElementById("submitBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      cancelEditBtn: document.getElementById("cancelEditBtn"),
+      search: document.getElementById("search"),
+      countLabel: document.getElementById("countLabel"),
+      tbody: document.getElementById("tbody"),
+      toast: document.getElementById("toast"),
+    };
+
+    /** @type {Student[]} */
+    let students = load();
+    let toastTimer = 0;
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return seed();
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : seed();
+      } catch {
+        return seed();
+      }
+    }
+
+    function seed() {
+      const demo = [
+        { id: crypto.randomUUID(), studentId: "2024001", name: "张三", gender: "男", klass: "计科2401", age: 19, phone: "13800001111" },
+        { id: crypto.randomUUID(), studentId: "2024002", name: "李四", gender: "女", klass: "计科2401", age: 18, phone: "13900002222" },
+        { id: crypto.randomUUID(), studentId: "2024003", name: "王五", gender: "男", klass: "软工2402", age: 20, phone: "" },
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(demo));
+      return demo;
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+    }
+
+    function toast(msg) {
+      els.toast.textContent = msg;
+      els.toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2200);
+    }
+
+    function resetForm(keepEdit = false) {
+      els.form.reset();
+      els.gender.value = "男";
+      if (!keepEdit) {
+        els.editId.value = "";
+        els.formTitle.textContent = "添加学生";
+        els.submitBtn.textContent = "添加";
+        els.cancelEditBtn.hidden = true;
+        els.studentId.disabled = false;
+      }
+    }
+
+    function enterEdit(student) {
+      els.editId.value = student.id;
+      els.studentId.value = student.studentId;
+      els.name.value = student.name;
+      els.gender.value = student.gender;
+      els.klass.value = student.klass;
+      els.age.value = String(student.age);
+      els.phone.value = student.phone || "";
+      els.formTitle.textContent = "编辑学生";
+      els.submitBtn.textContent = "保存修改";
+      els.cancelEditBtn.hidden = false;
+      els.studentId.disabled = true;
+      els.name.focus();
+    }
+
+    function getFiltered() {
+      const q = els.search.value.trim().toLowerCase();
+      if (!q) return students;
+      return students.filter((s) =>
+        [s.studentId, s.name, s.klass, s.phone].some((v) => String(v).toLowerCase().includes(q))
+      );
+    }
+
+    function render() {
+      const list = getFiltered();
+      els.countLabel.textContent = `共 ${list.length} 人` + (els.search.value.trim() ? `（全部 ${students.length}）` : "");
+
+      if (!list.length) {
+        els.tbody.innerHTML = `<tr><td colspan="7" class="empty">${students.length ? "没有匹配的学生" : "暂无学生，请先添加"}</td></tr>`;
+        return;
+      }
+
+      els.tbody.innerHTML = list
+        .map(
+          (s) => `
+        <tr>
+          <td>${escapeHtml(s.studentId)}</td>
+          <td>${escapeHtml(s.name)}</td>
+          <td>${escapeHtml(s.gender)}</td>
+          <td>${escapeHtml(s.klass)}</td>
+          <td>${s.age}</td>
+          <td>${escapeHtml(s.phone || "—")}</td>
+          <td>
+            <div class="row-actions">
+              <button type="button" class="btn-secondary btn-sm" data-edit="${s.id}">编辑</button>
+              <button type="button" class="btn-danger btn-sm" data-del="${s.id}">删除</button>
+            </div>
+          </td>
+        </tr>`
+        )
+        .join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    els.form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const studentId = els.studentId.value.trim();
+      const name = els.name.value.trim();
+      const gender = els.gender.value;
+      const klass = els.klass.value.trim();
+      const age = Number(els.age.value);
+      const phone = els.phone.value.trim();
+      const editId = els.editId.value;
+
+      if (!studentId || !name || !klass || !Number.isFinite(age)) {
+        toast("请完整填写必填项");
+        return;
+      }
+
+      if (editId) {
+        const idx = students.findIndex((s) => s.id === editId);
+        if (idx < 0) {
+          toast("未找到要编辑的学生");
+          resetForm();
+          render();
+          return;
+        }
+        students[idx] = { ...students[idx], name, gender, klass, age, phone };
+        save();
+        resetForm();
+        render();
+        toast("已保存修改");
+        return;
+      }
+
+      if (students.some((s) => s.studentId === studentId)) {
+        toast("学号已存在");
+        els.studentId.focus();
+        return;
+      }
+
+      students.unshift({
+        id: crypto.randomUUID(),
+        studentId,
+        name,
+        gender,
+        klass,
+        age,
+        phone,
+      });
+      save();
+      resetForm();
+      render();
+      toast("已添加学生");
+    });
+
+    els.resetBtn.addEventListener("click", () => {
+      if (els.editId.value) {
+        const current = students.find((s) => s.id === els.editId.value);
+        if (current) enterEdit(current);
+        else resetForm();
+      } else {
+        resetForm();
+      }
+    });
+
+    els.cancelEditBtn.addEventListener("click", () => {
+      resetForm();
+      toast("已取消编辑");
+    });
+
+    els.search.addEventListener("input", render);
+
+    els.tbody.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+
+      const editId = target.getAttribute("data-edit");
+      if (editId) {
+        const student = students.find((s) => s.id === editId);
+        if (student) enterEdit(student);
+        return;
+      }
+
+      const delId = target.getAttribute("data-del");
+      if (delId) {
+        const student = students.find((s) => s.id === delId);
+        if (!student) return;
+        if (!confirm(`确认删除学生「${student.name}」（${student.studentId}）？`)) return;
+        students = students.filter((s) => s.id !== delId);
+        if (els.editId.value === delId) resetForm();
+        save();
+        render();
+        toast("已删除");
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
