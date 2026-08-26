@@ -30,7 +30,7 @@ else ok("CSS 相对路径正确");
 if (!html.includes('src="./js/slides.js"')) fail("index.html 未使用相对路径引用 JS");
 else ok("JS 相对路径正确");
 
-const slideCount = (html.match(/class="slide/g) || []).length;
+const slideCount = (html.match(/data-slide="/g) || []).length;
 if (slideCount < 5) fail(`幻灯片数量过少：${slideCount}`);
 else ok(`幻灯片数量 ${slideCount}`);
 
