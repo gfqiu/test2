@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星澜门户 · Xinglan Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    :root {
+      --ink: #0c1a24;
+      --ink-soft: #2a3f4d;
+      --foam: #e8f4f2;
+      --mist: #a8c5c0;
+      --teal: #1a6b63;
+      --teal-bright: #2a9a8f;
+      --sand: #c4a882;
+      --glow: rgba(42, 154, 143, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Outfit", sans-serif;
+      color: var(--ink);
+      background: var(--foam);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Atmosphere */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 20%, rgba(26, 107, 99, 0.18), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 85% 10%, rgba(196, 168, 130, 0.22), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 50% 90%, rgba(42, 154, 143, 0.12), transparent 55%),
+        linear-gradient(165deg, #d4ebe7 0%, #e8f4f2 40%, #f0ebe3 100%);
+    }
+
+    .bg-mesh::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      font-family: "Instrument Serif", serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.75rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 400;
+      transition: color 0.25s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--teal); }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    /* Hero — one composition, brand first */
+    .hero {
+      min-height: calc(100vh - 4.5rem);
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      align-items: center;
+      gap: 2rem;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    .hero-copy {
+      animation: rise 0.9s ease-out both;
+    }
+
+    .brand {
+      font-family: "Instrument Serif", serif;
+      font-size: clamp(3.2rem, 7vw, 5.2rem);
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .brand em {
+      font-style: italic;
+      color: var(--teal);
+    }
+
+    .tagline {
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+      max-width: 28ch;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.75rem 1.4rem;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.25s, background 0.25s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: var(--teal);
+      color: #fff;
+      box-shadow: 0 8px 24px var(--glow);
+    }
+
+    .btn-primary:hover { background: var(--teal-bright); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid rgba(12, 26, 36, 0.2);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    .hero-visual {
+      position: relative;
+      height: min(72vh, 520px);
+      animation: fade-scale 1.1s ease-out 0.15s both;
+    }
+
+    .hero-visual .plane {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(26, 107, 99, 0.55), rgba(12, 26, 36, 0.4)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%231a6b63'/%3E%3Cstop offset='1' stop-color='%230c1a24'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='600'/%3E%3Cpath d='M0 420 Q200 340 400 400 T800 360 L800 600 L0 600Z' fill='%23a8c5c0' opacity='0.35'/%3E%3Cpath d='M0 480 Q250 400 500 460 T800 420 L800 600 L0 600Z' fill='%23e8f4f2' opacity='0.25'/%3E%3Ccircle cx='620' cy='140' r='48' fill='%23c4a882' opacity='0.7'/%3E%3C/svg%3E")
+        center / cover no-repeat;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+
+    /* Sections */
+    section {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+
+    .section-title {
+      font-family: "Instrument Serif", serif;
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      margin-bottom: 0.6rem;
+      animation: rise 0.7s ease-out both;
+    }
+
+    .section-desc {
+      color: var(--ink-soft);
+      font-weight: 300;
+      max-width: 42ch;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Services — interaction containers, not card clutter */
+    .services-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-top: 1px solid rgba(12, 26, 36, 0.12);
+    }
+
+    .service {
+      padding: 1.75rem 1.5rem 1.75rem 0;
+      border-bottom: 1px solid rgba(12, 26, 36, 0.12);
+      cursor: pointer;
+      transition: background 0.3s, padding-left 0.3s;
+    }
+
+    .service:nth-child(n+2) {
+      padding-left: 1.5rem;
+      border-left: 1px solid rgba(12, 26, 36, 0.12);
+    }
+
+    .service:hover,
+    .service.is-active {
+      background: rgba(26, 107, 99, 0.06);
+    }
+
+    .service:hover { padding-left: 1.75rem; }
+    .service:nth-child(1):hover { padding-left: 0.35rem; }
+
+    .service h3 {
+      font-family: "Instrument Serif", serif;
+      font-size: 1.45rem;
+      font-weight: 400;
+      margin-bottom: 0.45rem;
+      color: var(--ink);
+    }
+
+    .service p {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      font-weight: 300;
+    }
+
+    .service .num {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: var(--teal);
+      margin-bottom: 0.65rem;
+      font-weight: 500;
+    }
+
+    /* News / updates */
+    .updates {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .update-item {
+      display: grid;
+      grid-template-columns: 7rem 1fr auto;
+      align-items: baseline;
+      gap: 1.25rem;
+      padding: 1.15rem 0;
+      border-bottom: 1px solid rgba(12, 26, 36, 0.1);
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.2s;
+      animation: rise 0.6s ease-out both;
+    }
+
+    .update-item:hover { color: var(--teal); }
+    .update-item:hover .arrow { transform: translateX(4px); }
+
+    .update-date {
+      font-size: 0.8rem;
+      color: var(--mist);
+      font-weight: 500;
+    }
+
+    .update-title { font-weight: 400; }
+
+    .arrow {
+      color: var(--teal);
+      transition: transform 0.25s;
+      font-size: 1.1rem;
+    }
+
+    /* Contact strip */
+    .contact {
+      text-align: center;
+      padding-bottom: 6rem;
+    }
+
+    .contact .section-title { margin-bottom: 0.5rem; }
+
+    .contact form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .contact input {
+      flex: 1 1 220px;
+      padding: 0.8rem 1rem;
+      border: 1px solid rgba(12, 26, 36, 0.18);
+      background: rgba(255, 255, 255, 0.55);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .contact input:focus { border-color: var(--teal); }
+
+    .toast {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--teal);
+      min-height: 1.4em;
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+
+    .toast.show { opacity: 1; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: var(--mist);
+      border-top: 1px solid rgba(12, 26, 36, 0.08);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-scale {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes drift {
+      from { transform: scale(1) translate(0, 0); }
+      to { transform: scale(1.04) translate(-1.5%, 1%); }
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 1.5rem;
+      }
+
+      .hero-visual {
+        order: -1;
+        height: 42vw;
+        min-height: 200px;
+        max-height: 280px;
+      }
+
+      .services-list { grid-template-columns: 1fr; }
+
+      .service:nth-child(n+2) {
+        padding-left: 0;
+        border-left: none;
+      }
+
+      .service:hover { padding-left: 0.35rem; }
+
+      .update-item {
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem;
+      }
+
+      .update-date { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 4rem;
+        right: 1.5rem;
+        flex-direction: column;
+        background: rgba(232, 244, 242, 0.96);
+        padding: 1.25rem 1.5rem;
+        gap: 1rem;
+        box-shadow: 0 12px 40px rgba(12, 26, 36, 0.12);
+        z-index: 20;
+      }
+
+      .nav-links.open { display: flex; }
+      .nav-toggle { display: block; }
+      .nav { position: relative; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh" aria-hidden="true"></div>
+  <div id="app">
+    <header class="nav">
+      <a class="nav-brand" href="#top">星澜 Xinglan</a>
+      <button class="nav-toggle" @click="menuOpen = !menuOpen" aria-label="菜单">☰</button>
+      <ul class="nav-links" :class="{ open: menuOpen }">
+        <li v-for="link in nav" :key="link.id">
+          <a
+            :href="'#' + link.id"
+            :class="{ active: activeSection === link.id }"
+            @click="menuOpen = false"
+          >{{ link.label }}</a>
+        </li>
+      </ul>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1 class="brand">星澜<em>门户</em></h1>
+          <p class="tagline">汇聚资讯、服务与协作入口，一站抵达你的数字工作台。</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#services" @click="activeService = 0">进入服务</a>
+            <a class="btn btn-ghost" href="#updates">查看动态</a>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="plane"></div>
+        </div>
+      </section>
+
+      <section id="services">
+        <h2 class="section-title">核心服务</h2>
+        <p class="section-desc">选择一项能力，快速跳转到对应工作流。</p>
+        <div class="services-list">
+          <article
+            v-for="(s, i) in services"
+            :key="s.title"
+            class="service"
+            :class="{ 'is-active': activeService === i }"
+            @click="activeService = i"
+            @mouseenter="activeService = i"
+          >
+            <span class="num">0{{ i + 1 }}</span>
+            <h3>{{ s.title }}</h3>
+            <p>{{ s.desc }}</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="updates">
+        <h2 class="section-title">门户动态</h2>
+        <p class="section-desc">最近上线的能力与公告。</p>
+        <div class="updates">
+          <a
+            v-for="(u, i) in updates"
+            :key="u.title"
+            class="update-item"
+            href="#contact"
+            :style="{ animationDelay: (i * 0.08) + 's' }"
+          >
+            <span class="update-date">{{ u.date }}</span>
+            <span class="update-title">{{ u.title }}</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="contact" class="contact">
+        <h2 class="section-title">保持联系</h2>
+        <p class="section-desc" style="margin-left: auto; margin-right: auto;">留下邮箱，获取门户更新与服务开通指引。</p>
+        <form @submit.prevent="subscribe">
+          <input
+            v-model.trim="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+            aria-label="电子邮箱"
+          />
+          <button class="btn btn-primary" type="submit">订阅通知</button>
+        </form>
+        <p class="toast" :class="{ show: toast }">{{ toast }}</p>
+      </section>
+    </main>
+
+    <footer>© {{ year }} 星澜门户 · 用 Vue 构建的简易门户演示</footer>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted, onUnmounted } = Vue;
+
+    createApp({
+      setup() {
+        const menuOpen = ref(false);
+        const activeService = ref(0);
+        const activeSection = ref("top");
+        const email = ref("");
+        const toast = ref("");
+        const year = new Date().getFullYear();
+
+        const nav = [
+          { id: "services", label: "服务" },
+          { id: "updates", label: "动态" },
+          { id: "contact", label: "联系" },
+        ];
+
+        const services = [
+          {
+            title: "统一入口",
+            desc: "单点登录与应用目录，减少切换成本。",
+          },
+          {
+            title: "资讯中心",
+            desc: "公告、政策与产品更新集中呈现。",
+          },
+          {
+            title: "协作空间",
+            desc: "团队文档、任务与日程的轻量聚合。",
+          },
+        ];
+
+        const updates = [
+          { date: "2026-08-20", title: "门户导航与主题样式全面刷新" },
+          { date: "2026-08-12", title: "新增协作空间预览入口" },
+          { date: "2026-08-01", title: "统一入口支持多应用快捷跳转" },
+        ];
+
+        let toastTimer = null;
+
+        function subscribe() {
+          if (!email.value) return;
+          toast.value = "已记录：" + email.value + "，感谢订阅。";
+          email.value = "";
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => { toast.value = ""; }, 3200);
+        }
+
+        function onScroll() {
+          const ids = ["services", "updates", "contact"];
+          let current = "top";
+          for (const id of ids) {
+            const el = document.getElementById(id);
+            if (el && el.getBoundingClientRect().top <= 120) current = id;
+          }
+          activeSection.value = current;
+        }
+
+        onMounted(() => {
+          window.addEventListener("scroll", onScroll, { passive: true });
+          onScroll();
+        });
+
+        onUnmounted(() => {
+          window.removeEventListener("scroll", onScroll);
+          clearTimeout(toastTimer);
+        });
+
+        return {
+          nav,
+          services,
+          updates,
+          menuOpen,
+          activeService,
+          activeSection,
+          email,
+          toast,
+          year,
+          subscribe,
+        };
+      },
+    }).mount("#app");
+  </script>
+</body>
+</html>
