@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>联系我 · 林砚</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body>
+    <div data-site-nav></div>
+    <main id="main">
+      <header class="page-hero">
+        <h1>联系我</h1>
+        <p>欢迎通过邮箱或社交账号交流；也可使用下方留言表单。</p>
+      </header>
+      <section class="contact-grid section">
+        <div>
+          <h2>联系方式</h2>
+          <p class="muted">点击可复制邮箱，或跳转到社交主页。</p>
+          <div class="social-row" id="contact-social"></div>
+          <div class="cta-row" style="margin-top: 1rem">
+            <button class="btn btn-primary" type="button" id="copy-email">复制邮箱</button>
+            <a class="btn btn-ghost" id="mail-link" href="#">发送邮件</a>
+          </div>
+        </div>
+        <div>
+          <h2>留言</h2>
+          <p class="muted">静态站示例：可替换为 Formspree / Getform 等第三方提交地址。</p>
+          <form
+            id="contact-form"
+            action="https://formspree.io/f/xwplaceholder"
+            method="POST"
+          >
+            <div class="field">
+              <label for="name">称呼</label>
+              <input id="name" name="name" required placeholder="怎么称呼你" />
+            </div>
+            <div class="field">
+              <label for="email">邮箱</label>
+              <input id="email" name="email" type="email" required placeholder="you@example.com" />
+            </div>
+            <div class="field">
+              <label for="message">留言</label>
+              <textarea id="message" name="message" required placeholder="想交流的话题…"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">发送留言</button>
+          </form>
+        </div>
+      </section>
+    </main>
+    <div data-site-footer></div>
+    <script src="./js/data.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const email = SITE.social.email;
+        document.getElementById("contact-social").innerHTML = `
+          <a href="mailto:${email}">${email}</a>
+          <a href="${SITE.social.github}" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="${SITE.social.gitee}" target="_blank" rel="noopener noreferrer">Gitee</a>
+          <a href="${SITE.social.blog}">博客</a>`;
+        document.getElementById("mail-link").href = `mailto:${email}`;
+        document.getElementById("copy-email").addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(email);
+            SiteApp.showToast("邮箱已复制");
+          } catch (e) {
+            SiteApp.showToast("复制失败，请手动选择邮箱");
+          }
+        });
+        document.getElementById("contact-form").addEventListener("submit", (e) => {
+          // 演示环境：阻止真实提交到占位 Formspree，改为本地提示
+          e.preventDefault();
+          SiteApp.showToast("演示模式：请替换 Formspree 地址后提交");
+        });
+      });
+    </script>
+  </body>
+</html>

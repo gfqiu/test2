@@ -1,0 +1,10 @@
+{
+  "name": "student-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "学生个人官网 — 静态站点",
+  "scripts": {
+    "test": "node test/site.test.js",
+    "start": "npx --yes serve -l 4173 ."
+  }
+}

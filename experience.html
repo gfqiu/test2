@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>经历履历 · 林砚</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body>
+    <div data-site-nav></div>
+    <main id="main">
+      <header class="page-hero">
+        <h1>经历履历</h1>
+        <p>教育、校园项目、竞赛、实习意向与证书，以时间轴呈现。</p>
+      </header>
+      <section class="section">
+        <div class="timeline" id="experience-root"></div>
+      </section>
+    </main>
+    <div data-site-footer></div>
+    <script src="./js/data.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+      const typeLabel = {
+        education: "教育",
+        project: "校园项目",
+        contest: "竞赛",
+        internship: "实习",
+        award: "证书 / 获奖",
+      };
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("experience-root").innerHTML = SITE.experience
+          .map(
+            (item) => `
+            <div class="timeline-item">
+              <div class="period">${item.period} · ${typeLabel[item.type] || item.type}</div>
+              <strong>${item.title}</strong>
+              <p class="muted">${item.detail}</p>
+            </div>`
+          )
+          .join("");
+      });
+    </script>
+  </body>
+</html>
