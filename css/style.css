@@ -165,16 +165,7 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: 0;
-}
-
-.board-grid line {
-  stroke: var(--board-line);
-  stroke-width: 0.45;
-  stroke-linecap: square;
-}
-
-.board-grid .star-point {
-  fill: var(--board-line);
+  display: block;
 }
 
 .board-cells {

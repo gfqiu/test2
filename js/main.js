@@ -24,62 +24,101 @@ let gameOver = false;
 /** @type {{ board: number[][], current: number }[]} */
 let history = [];
 
+/** @type {HTMLCanvasElement | null} */
+let gridCanvas = null;
+/** @type {HTMLDivElement | null} */
+let cellsEl = null;
+
 /**
- * 用 SVG 精确画 15 条横线 + 15 条竖线，穿过每个交叉点（格子中心）。
+ * 按实际像素尺寸用 Canvas 画网格，避免亚像素模糊与缺边。
+ * @param {HTMLCanvasElement} canvas
  * @param {number} size
  */
-function createGridSvg(size) {
-  const NS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("class", "board-grid");
-  svg.setAttribute("viewBox", "0 0 100 100");
-  svg.setAttribute("preserveAspectRatio", "none");
-  svg.setAttribute("aria-hidden", "true");
+function drawGrid(canvas, size) {
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth;
+  const cssH = canvas.clientHeight;
+  if (cssW < 2 || cssH < 2) return;
 
-  const step = 100 / size;
-  for (let i = 0; i < size; i += 1) {
-    const pos = step * i + step / 2;
-    const v = document.createElementNS(NS, "line");
-    v.setAttribute("x1", String(pos));
-    v.setAttribute("y1", String(step / 2));
-    v.setAttribute("x2", String(pos));
-    v.setAttribute("y2", String(100 - step / 2));
-    svg.appendChild(v);
-
-    const h = document.createElementNS(NS, "line");
-    h.setAttribute("x1", String(step / 2));
-    h.setAttribute("y1", String(pos));
-    h.setAttribute("x2", String(100 - step / 2));
-    h.setAttribute("y2", String(pos));
-    svg.appendChild(h);
+  const w = Math.max(1, Math.round(cssW * dpr));
+  const h = Math.max(1, Math.round(cssH * dpr));
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w;
+    canvas.height = h;
   }
 
-  // 天元与星位（标准 15 路）
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = "#5c4030";
+  ctx.fillStyle = "#5c4030";
+  ctx.lineWidth = Math.max(1, Math.round(dpr));
+  ctx.lineCap = "square";
+
+  const cell = Math.min(w, h) / size;
+  const originX = (w - cell * size) / 2 + cell / 2;
+  const originY = (h - cell * size) / 2 + cell / 2;
+  const endX = originX + cell * (size - 1);
+  const endY = originY + cell * (size - 1);
+
+  ctx.beginPath();
+  for (let i = 0; i < size; i += 1) {
+    const x = Math.round(originX + i * cell) + 0.5;
+    const y = Math.round(originY + i * cell) + 0.5;
+    ctx.moveTo(x, Math.round(originY) + 0.5);
+    ctx.lineTo(x, Math.round(endY) + 0.5);
+    ctx.moveTo(Math.round(originX) + 0.5, y);
+    ctx.lineTo(Math.round(endX) + 0.5, y);
+  }
+  ctx.stroke();
+
   const starIndexes = [3, 7, 11];
-  for (const r of starIndexes) {
-    for (const c of starIndexes) {
-      const cx = step * c + step / 2;
-      const cy = step * r + step / 2;
-      const dot = document.createElementNS(NS, "circle");
-      dot.setAttribute("cx", String(cx));
-      dot.setAttribute("cy", String(cy));
-      dot.setAttribute("r", "0.9");
-      dot.setAttribute("class", "star-point");
-      svg.appendChild(dot);
+  const r = Math.max(2, Math.round(cell * 0.08));
+  for (const row of starIndexes) {
+    for (const col of starIndexes) {
+      const cx = Math.round(originX + col * cell) + 0.5;
+      const cy = Math.round(originY + row * cell) + 0.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
+}
 
-  return svg;
+function ensureBoardShell() {
+  if (gridCanvas && cellsEl) return;
+
+  boardEl.innerHTML = "";
+  boardEl.style.setProperty("--size", String(BOARD_SIZE));
+
+  gridCanvas = document.createElement("canvas");
+  gridCanvas.className = "board-grid";
+  gridCanvas.setAttribute("aria-hidden", "true");
+  boardEl.appendChild(gridCanvas);
+
+  cellsEl = document.createElement("div");
+  cellsEl.className = "board-cells";
+  cellsEl.setAttribute("role", "presentation");
+  boardEl.appendChild(cellsEl);
+
+  const redraw = () => {
+    if (gridCanvas) drawGrid(gridCanvas, BOARD_SIZE);
+  };
+  requestAnimationFrame(redraw);
+
+  if (typeof ResizeObserver !== "undefined") {
+    new ResizeObserver(redraw).observe(boardEl);
+  } else {
+    window.addEventListener("resize", redraw);
+  }
 }
 
 function renderBoard() {
-  boardEl.innerHTML = "";
-  boardEl.style.setProperty("--size", String(BOARD_SIZE));
-  boardEl.appendChild(createGridSvg(BOARD_SIZE));
+  ensureBoardShell();
+  if (!cellsEl) return;
 
-  const cells = document.createElement("div");
-  cells.className = "board-cells";
-  cells.setAttribute("role", "presentation");
+  cellsEl.innerHTML = "";
 
   for (let r = 0; r < BOARD_SIZE; r += 1) {
     for (let c = 0; c < BOARD_SIZE; c += 1) {
@@ -102,11 +141,13 @@ function renderBoard() {
       }
 
       cell.addEventListener("click", () => onCellClick(r, c));
-      cells.appendChild(cell);
+      cellsEl.appendChild(cell);
     }
   }
 
-  boardEl.appendChild(cells);
+  if (gridCanvas) {
+    requestAnimationFrame(() => drawGrid(gridCanvas, BOARD_SIZE));
+  }
 }
 
 function updateStatus(message) {
