@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>果园连连看</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@500;700;800&family=ZCOOL+KuaiLe&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="leaf-pattern" aria-hidden="true"></div>
+    <main class="app">
+      <header class="hero">
+        <h1 class="brand">果园连连看</h1>
+        <p class="tagline">点两枚相同果实，直线或最多两折连线即可摘下。</p>
+      </header>
+
+      <div class="hud">
+        <div class="stat">得分 <strong id="score">0</strong></div>
+        <div class="stat">剩余 <strong id="remain">0</strong></div>
+        <div class="stat">时间 <strong id="time">3:00</strong></div>
+        <div class="actions">
+          <button type="button" class="btn-primary" id="btn-restart">新开一局</button>
+          <button type="button" class="btn-ghost" id="btn-shuffle">重排</button>
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <div class="board" id="board" role="grid" aria-label="连连看棋盘"></div>
+        <svg class="path-layer" id="path-layer" aria-hidden="true"></svg>
+      </div>
+
+      <p class="status" id="status" aria-live="polite"></p>
+      <p class="hint">规则：同图案、路径不超过两折（拐角 ≤ 2），可沿棋盘外缘绕行。</p>
+    </main>
+
+    <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+      <div class="overlay-panel">
+        <h2 id="overlay-title">通关！</h2>
+        <p id="overlay-msg"></p>
+        <button type="button" class="btn-primary" id="btn-overlay-restart">再玩一局</button>
+      </div>
+    </div>
+
+    <script src="./js/logic.js"></script>
+    <script src="./js/game.js"></script>
+  </body>
+</html>
