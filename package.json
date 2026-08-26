@@ -1,0 +1,9 @@
+{
+  "name": "whack-a-mole",
+  "version": "1.0.0",
+  "private": true,
+  "description": "静态托管打地鼠小游戏",
+  "scripts": {
+    "test": "node test/smoke.test.js"
+  }
+}
