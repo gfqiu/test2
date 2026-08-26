@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>五子棋</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+XiaoWei&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="brand">
+        <h1>五子棋</h1>
+        <p>黑白轮流 · 连成五子即胜</p>
+      </header>
+
+      <section class="panel" aria-label="对局控制">
+        <p id="status" class="status" role="status" aria-live="polite">轮到黑棋</p>
+        <div class="actions">
+          <button type="button" id="restart" class="btn btn-primary">重新开始</button>
+          <button type="button" id="undo" class="btn">悔棋</button>
+        </div>
+      </section>
+
+      <div class="board-wrap">
+        <div id="board" class="board" role="grid" aria-label="十五路棋盘"></div>
+      </div>
+
+      <p class="hint">点击交叉点落子 · 支持悔棋一步步回退</p>
+    </main>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
