@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>学习笔记 · 林砚</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body>
+    <div data-site-nav></div>
+    <main id="main">
+      <header class="page-hero">
+        <h1>学习笔记</h1>
+        <p>按时间倒序浏览，支持标签筛选与关键词搜索。</p>
+      </header>
+      <div class="toolbar">
+        <input
+          class="search-input"
+          type="search"
+          placeholder="搜索笔记标题 / 摘要 / 标签"
+          data-note-search
+          aria-label="搜索笔记"
+        />
+      </div>
+      <div class="filters" data-note-filters></div>
+      <section class="grid-cards" data-notes></section>
+    </main>
+    <div data-site-footer></div>
+    <script src="./js/data.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/pages.js"></script>
+  </body>
+</html>

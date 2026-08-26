@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>林砚 · 学生个人官网</title>
+    <meta
+      name="description"
+      content="林砚的学生个人官网：简介、项目作品、学习笔记、技能与经历。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body>
+    <div data-site-nav></div>
+    <section class="hero" aria-label="首页主视觉">
+      <div class="hero-inner">
+        <p class="hero-brand">林砚</p>
+        <h2>前端 · AI 方向的在校学生</h2>
+        <p>用代码记录成长，用作品证明热爱。</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="./projects.html">查看作品</a>
+          <a class="btn btn-ghost" href="./about.html">了解我</a>
+        </div>
+      </div>
+    </section>
+    <main id="main">
+      <section class="profile-strip">
+        <img class="avatar" src="./assets/avatar.svg" alt="林砚头像" />
+        <div>
+          <p id="home-intro"></p>
+          <div class="tag-row" id="home-tags"></div>
+          <div class="social-row" id="home-social"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>快捷导航</h2>
+        <p class="muted">跳转到你关心的板块。</p>
+        <div class="quick-nav">
+          <a href="./about.html"><strong>关于我</strong><span class="muted">院校、方向与成长时间线</span></a>
+          <a href="./projects.html"><strong>项目作品</strong><span class="muted">可筛选的作品卡片</span></a>
+          <a href="./notes.html"><strong>学习笔记</strong><span class="muted">Markdown 笔记与检索</span></a>
+          <a href="./skills.html"><strong>技能栈</strong><span class="muted">能力可视化</span></a>
+          <a href="./experience.html"><strong>经历履历</strong><span class="muted">教育、竞赛与证书</span></a>
+          <a href="./contact.html"><strong>联系我</strong><span class="muted">邮箱与留言</span></a>
+        </div>
+      </section>
+    </main>
+    <div data-site-footer></div>
+    <script src="./js/data.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const intro = document.getElementById("home-intro");
+        const tags = document.getElementById("home-tags");
+        const social = document.getElementById("home-social");
+        if (!window.SITE) return;
+        intro.textContent = SITE.intro;
+        tags.innerHTML = SITE.tags.map((t) => `<span class="tag">${t}</span>`).join("");
+        social.innerHTML = `
+          <a href="${SITE.social.github}" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="${SITE.social.gitee}" target="_blank" rel="noopener noreferrer">Gitee</a>
+          <a href="${SITE.social.blog}">博客 / 笔记</a>
+          <a href="mailto:${SITE.social.email}">邮箱</a>`;
+      });
+    </script>
+  </body>
+</html>
