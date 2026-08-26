@@ -1,0 +1,10 @@
+{
+  "name": "gomoku",
+  "version": "1.0.0",
+  "private": true,
+  "description": "五子棋小游戏（静态页面）",
+  "scripts": {
+    "test": "node --test test/gomoku.test.js"
+  },
+  "type": "module"
+}
