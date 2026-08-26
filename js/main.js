@@ -24,9 +24,62 @@ let gameOver = false;
 /** @type {{ board: number[][], current: number }[]} */
 let history = [];
 
+/**
+ * 用 SVG 精确画 15 条横线 + 15 条竖线，穿过每个交叉点（格子中心）。
+ * @param {number} size
+ */
+function createGridSvg(size) {
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("class", "board-grid");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("aria-hidden", "true");
+
+  const step = 100 / size;
+  for (let i = 0; i < size; i += 1) {
+    const pos = step * i + step / 2;
+    const v = document.createElementNS(NS, "line");
+    v.setAttribute("x1", String(pos));
+    v.setAttribute("y1", String(step / 2));
+    v.setAttribute("x2", String(pos));
+    v.setAttribute("y2", String(100 - step / 2));
+    svg.appendChild(v);
+
+    const h = document.createElementNS(NS, "line");
+    h.setAttribute("x1", String(step / 2));
+    h.setAttribute("y1", String(pos));
+    h.setAttribute("x2", String(100 - step / 2));
+    h.setAttribute("y2", String(pos));
+    svg.appendChild(h);
+  }
+
+  // 天元与星位（标准 15 路）
+  const starIndexes = [3, 7, 11];
+  for (const r of starIndexes) {
+    for (const c of starIndexes) {
+      const cx = step * c + step / 2;
+      const cy = step * r + step / 2;
+      const dot = document.createElementNS(NS, "circle");
+      dot.setAttribute("cx", String(cx));
+      dot.setAttribute("cy", String(cy));
+      dot.setAttribute("r", "0.9");
+      dot.setAttribute("class", "star-point");
+      svg.appendChild(dot);
+    }
+  }
+
+  return svg;
+}
+
 function renderBoard() {
   boardEl.innerHTML = "";
   boardEl.style.setProperty("--size", String(BOARD_SIZE));
+  boardEl.appendChild(createGridSvg(BOARD_SIZE));
+
+  const cells = document.createElement("div");
+  cells.className = "board-cells";
+  cells.setAttribute("role", "presentation");
 
   for (let r = 0; r < BOARD_SIZE; r += 1) {
     for (let c = 0; c < BOARD_SIZE; c += 1) {
@@ -49,9 +102,11 @@ function renderBoard() {
       }
 
       cell.addEventListener("click", () => onCellClick(r, c));
-      boardEl.appendChild(cell);
+      cells.appendChild(cell);
     }
   }
+
+  boardEl.appendChild(cells);
 }
 
 function updateStatus(message) {
@@ -89,7 +144,6 @@ function onCellClick(row, col) {
 
 function celebrate() {
   boardEl.classList.remove("win-pulse");
-  // force reflow for replay
   void boardEl.offsetWidth;
   boardEl.classList.add("win-pulse");
 }
