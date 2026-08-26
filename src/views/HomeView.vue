@@ -40,10 +40,7 @@ const news = [
   <div class="home">
     <section class="hero">
       <div class="hero-media" aria-hidden="true">
-        <img
-          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80"
-          alt=""
-        />
+        <img class="hero-photo" src="../assets/hero.jpg" alt="" />
         <div class="hero-veil" />
         <div class="hero-glow" />
       </div>
@@ -121,22 +118,72 @@ const news = [
 .hero-media {
   position: absolute;
   inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 20%, rgba(246, 215, 168, 0.35), transparent 55%),
+    linear-gradient(165deg, #0a3f3d 0%, #0d5c58 38%, #145a56 68%, #0b2f2e 100%);
 }
 
-.hero-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform-origin: center;
-  animation: drift 18s ease-in-out infinite;
+.hero-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.horizon {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 18%;
+  height: 42%;
+  background:
+    linear-gradient(180deg, transparent, rgba(8, 40, 38, 0.55) 30%, rgba(6, 28, 27, 0.85)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 18px,
+      rgba(232, 242, 240, 0.04) 18px 19px
+    );
+  clip-path: polygon(0 35%, 12% 28%, 28% 40%, 46% 22%, 63% 36%, 78% 18%, 100% 32%, 100% 100%, 0 100%);
+}
+
+.sun {
+  position: absolute;
+  width: min(28vw, 220px);
+  height: min(28vw, 220px);
+  right: 14%;
+  top: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe6b8, #d97706 55%, transparent 72%);
+  opacity: 0.85;
+  animation: drift 14s ease-in-out infinite;
+}
+
+.wave {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 28%;
+  border-radius: 45% 55% 50% 50%;
+  filter: blur(1px);
+}
+
+.wave-a {
+  bottom: -4%;
+  background: linear-gradient(180deg, rgba(232, 242, 240, 0.18), rgba(13, 79, 76, 0.55));
+  animation: drift 10s ease-in-out infinite;
+}
+
+.wave-b {
+  bottom: -10%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(8, 56, 54, 0.7));
+  animation: drift 13s ease-in-out infinite reverse;
 }
 
 .hero-veil {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(8, 56, 54, 0.35) 0%, rgba(8, 56, 54, 0.55) 42%, rgba(8, 56, 54, 0.88) 100%),
-    linear-gradient(90deg, rgba(8, 56, 54, 0.55), transparent 55%);
+    linear-gradient(180deg, rgba(8, 56, 54, 0.2) 0%, rgba(8, 56, 54, 0.35) 42%, rgba(8, 56, 54, 0.78) 100%),
+    linear-gradient(90deg, rgba(8, 56, 54, 0.45), transparent 58%);
 }
 
 .hero-glow {
