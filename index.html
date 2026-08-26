@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>澜屿 · 门户</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    :root {
+      --ink: #0e1a1f;
+      --mist: #e8f1f0;
+      --sea: #1a6b63;
+      --sea-deep: #0d3d39;
+      --foam: #b8ddd6;
+      --sand: #c4a574;
+      --glow: rgba(26, 107, 99, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Outfit", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 0%, #c5e4df 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 90% 20%, #dce8e2 0%, transparent 50%),
+        linear-gradient(165deg, #f2f7f6 0%, #dfece9 45%, #c9ddd8 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #app { min-height: 100vh; }
+
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 6vw;
+      background: rgba(242, 247, 246, 0.72);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(14, 26, 31, 0.06);
+      animation: fadeDown 0.7s ease both;
+    }
+
+    .nav-brand {
+      font-family: "Noto Serif SC", serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.12em;
+      color: var(--sea-deep);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.75rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0.72;
+      transition: opacity 0.2s, color 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      opacity: 1;
+      color: var(--sea);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      align-items: end;
+      padding: 0 6vw 12vh;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, rgba(14, 26, 31, 0.55) 0%, rgba(14, 26, 31, 0.15) 40%, transparent 70%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23a8cfc8'/%3E%3Cstop offset='55%25' stop-color='%2378a9a2'/%3E%3Cstop offset='100%25' stop-color='%231a4a45'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='800' fill='url(%23sky)'/%3E%3Cpath d='M0 480 Q200 420 400 470 T800 450 T1200 480 V800 H0Z' fill='%230d3d39' opacity='0.55'/%3E%3Cpath d='M0 540 Q300 480 600 530 T1200 520 V800 H0Z' fill='%231a6b63' opacity='0.7'/%3E%3Ccircle cx='920' cy='160' r='48' fill='%23f5f0e0' opacity='0.85'/%3E%3C/svg%3E") center / cover no-repeat;
+      animation: heroReveal 1.2s ease both;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 36rem;
+      animation: riseIn 1s 0.25s ease both;
+    }
+
+    .brand {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(3.2rem, 8vw, 5.5rem);
+      font-weight: 700;
+      color: #f7fbfa;
+      letter-spacing: 0.08em;
+      line-height: 1.05;
+      text-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .tagline {
+      margin-top: 1rem;
+      font-size: 1.05rem;
+      color: rgba(247, 251, 250, 0.88);
+      line-height: 1.6;
+      max-width: 28rem;
+    }
+
+    .cta-row {
+      margin-top: 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.5rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--mist);
+      color: var(--sea-deep);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #f7fbfa;
+      border: 1.5px solid rgba(247, 251, 250, 0.55);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(247, 251, 250, 0.12);
+      border-color: #f7fbfa;
+    }
+
+    section {
+      padding: 5.5rem 6vw;
+    }
+
+    .section-head {
+      max-width: 32rem;
+      margin-bottom: 2.5rem;
+      animation: riseIn 0.8s ease both;
+    }
+
+    .section-head h2 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+      font-weight: 700;
+      color: var(--sea-deep);
+      letter-spacing: 0.04em;
+    }
+
+    .section-head p {
+      margin-top: 0.65rem;
+      color: rgba(14, 26, 31, 0.68);
+      line-height: 1.65;
+    }
+
+    .entries {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .entry {
+      text-align: left;
+      padding: 1.6rem 1.4rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid rgba(26, 107, 99, 0.2);
+      cursor: pointer;
+      font-family: inherit;
+      color: inherit;
+      transition: border-color 0.25s, transform 0.25s, background 0.25s;
+      animation: riseIn 0.7s ease both;
+    }
+
+    .entry:nth-child(1) { animation-delay: 0.05s; }
+    .entry:nth-child(2) { animation-delay: 0.12s; }
+    .entry:nth-child(3) { animation-delay: 0.19s; }
+    .entry:nth-child(4) { animation-delay: 0.26s; }
+
+    .entry:hover,
+    .entry.is-active {
+      border-color: var(--sea);
+      background: rgba(26, 107, 99, 0.06);
+      transform: translateY(-3px);
+    }
+
+    .entry h3 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--sea-deep);
+      margin-bottom: 0.45rem;
+    }
+
+    .entry p {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: rgba(14, 26, 31, 0.65);
+    }
+
+    .panel {
+      margin-top: 2rem;
+      padding: 1.5rem 0 0;
+      border-top: 1px solid rgba(14, 26, 31, 0.08);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .panel h3 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.35rem;
+      color: var(--sea-deep);
+      margin-bottom: 0.5rem;
+    }
+
+    .panel p {
+      color: rgba(14, 26, 31, 0.7);
+      line-height: 1.7;
+      max-width: 40rem;
+    }
+
+    .about {
+      background:
+        linear-gradient(120deg, rgba(26, 107, 99, 0.08), transparent 60%),
+        rgba(255, 255, 255, 0.35);
+    }
+
+    .about-body {
+      max-width: 38rem;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: rgba(14, 26, 31, 0.75);
+    }
+
+    footer {
+      padding: 2.5rem 6vw 3rem;
+      border-top: 1px solid rgba(14, 26, 31, 0.08);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: rgba(14, 26, 31, 0.5);
+    }
+
+    footer strong {
+      font-family: "Noto Serif SC", serif;
+      color: var(--sea-deep);
+      font-weight: 700;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(22px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes heroReveal {
+      from { opacity: 0; transform: scale(1.04); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.82rem; }
+      .hero { padding-bottom: 8vh; align-items: end; }
+      section { padding: 4rem 5vw; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <nav class="nav">
+      <div class="nav-brand">澜屿</div>
+      <ul class="nav-links">
+        <li><a href="#home" :class="{ active: section === 'home' }" @click="section = 'home'">首页</a></li>
+        <li><a href="#entries" :class="{ active: section === 'entries' }" @click="section = 'entries'">入口</a></li>
+        <li><a href="#about" :class="{ active: section === 'about' }" @click="section = 'about'">关于</a></li>
+      </ul>
+    </nav>
+
+    <header id="home" class="hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-content">
+        <h1 class="brand">澜屿</h1>
+        <p class="tagline">把常用服务与内容收拢到一处，安静地进入你的一天。</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#entries" @click="section = 'entries'">浏览入口</a>
+          <a class="btn btn-ghost" href="#about" @click="section = 'about'">了解更多</a>
+        </div>
+      </div>
+    </header>
+
+    <section id="entries">
+      <div class="section-head">
+        <h2>门户入口</h2>
+        <p>选择一项，查看简介与去向。</p>
+      </div>
+      <div class="entries">
+        <button
+          v-for="item in entries"
+          :key="item.id"
+          type="button"
+          class="entry"
+          :class="{ 'is-active': activeId === item.id }"
+          @click="select(item.id)"
+        >
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.blurb }}</p>
+        </button>
+      </div>
+      <div v-if="active" class="panel" :key="active.id">
+        <h3>{{ active.title }}</h3>
+        <p>{{ active.detail }}</p>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <div class="section-head">
+        <h2>关于澜屿</h2>
+        <p>一个用 Vue 搭的轻量门户，强调清晰路径与安静氛围。</p>
+      </div>
+      <p class="about-body">
+        澜屿面向个人或小团队的日常导航需求：首页一眼认出品牌，入口区只做一件事——帮你挑对去处。无需构建工具，打开即可使用。
+      </p>
+    </section>
+
+    <footer>
+      <span><strong>澜屿</strong> · Vue 简易门户</span>
+      <span>© {{ year }}</span>
+    </footer>
+  </div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+
+    createApp({
+      setup() {
+        const section = ref("home");
+        const activeId = ref(null);
+        const year = new Date().getFullYear();
+
+        const entries = [
+          {
+            id: "docs",
+            title: "文档中心",
+            blurb: "规范、手册与更新说明。",
+            detail: "集中存放产品说明与协作规范，按主题检索，减少在多个文档库之间来回切换。",
+          },
+          {
+            id: "tools",
+            title: "工具台",
+            blurb: "常用小工具与快捷链接。",
+            detail: "把高频脚本、计算器与外部服务书签放在一处，打开门户即可直达。",
+          },
+          {
+            id: "status",
+            title: "服务状态",
+            blurb: "核心服务健康一览。",
+            detail: "快速查看关键服务是否可用，以及近期维护窗口，避免盲目排查。",
+          },
+          {
+            id: "notes",
+            title: "公告板",
+            blurb: "团队通知与轻量动态。",
+            detail: "发布短讯与变更提醒，适合不需要完整 CMS 的小范围沟通。",
+          },
+        ];
+
+        const active = computed(() =>
+          entries.find((e) => e.id === activeId.value) || null
+        );
+
+        function select(id) {
+          activeId.value = activeId.value === id ? null : id;
+          section.value = "entries";
+        }
+
+        return { section, entries, activeId, active, select, year };
+      },
+    }).mount("#app");
+  </script>
+</body>
+</html>
