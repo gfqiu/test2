@@ -2,526 +2,610 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>学生管理系统</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>飞机大战</title>
   <style>
     :root {
-      --bg: #0f1a24;
-      --panel: #162533;
-      --line: #2a3d4f;
-      --text: #e8f0f6;
-      --muted: #8aa0b3;
-      --accent: #2db88a;
-      --accent-hover: #249e76;
-      --danger: #e06b6b;
-      --danger-hover: #c95555;
-      --warn: #d4a017;
-      --input: #0c141c;
-      --focus: #3ecf9a;
-      --radius: 10px;
+      --bg: #07101c;
+      --panel: rgba(12, 24, 40, 0.88);
+      --line: #29415c;
+      --text: #e8f2ff;
+      --muted: #8aa4bf;
+      --accent: #3ad0ff;
+      --danger: #ff5d6c;
+      --warn: #ffc857;
       --font: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: var(--font);
-      background:
-        radial-gradient(1200px 600px at 10% -10%, #1d3a4a 0%, transparent 55%),
-        radial-gradient(900px 500px at 100% 0%, #1a4036 0%, transparent 50%),
-        var(--bg);
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(1000px 700px at 50% -10%, #123054 0%, transparent 55%), var(--bg);
       color: var(--text);
-      min-height: 100vh;
-      padding: 28px 16px 48px;
+      font-family: var(--font);
+      touch-action: none;
+      user-select: none;
     }
-
-    .wrap {
-      max-width: 960px;
-      margin: 0 auto;
-    }
-
-    header {
-      margin-bottom: 28px;
-    }
-
-    header h1 {
-      font-size: clamp(1.6rem, 3vw, 2rem);
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    header p {
-      color: var(--muted);
-      margin-top: 8px;
-      font-size: 0.95rem;
-    }
-
-    .panel {
-      background: color-mix(in srgb, var(--panel) 92%, transparent);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 18px;
-      backdrop-filter: blur(6px);
-    }
-
-    .panel h2 {
-      font-size: 1.05rem;
-      margin-bottom: 14px;
-      font-weight: 600;
-    }
-
-    .form-grid {
+    .app {
+      height: 100%;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px 14px;
+      place-items: center;
+      padding: 12px;
     }
-
-    label {
+    .stage {
+      position: relative;
+      width: min(420px, 100vw - 16px);
+      aspect-ratio: 3 / 5;
+      max-height: calc(100vh - 24px);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      background: #050b14;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(#071526, #0a1a2e 55%, #08131f);
+    }
+    .hud {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 0.85rem;
-      color: var(--muted);
+      justify-content: space-between;
+      padding: 12px 14px;
     }
-
-    label.full { grid-column: 1 / -1; }
-
-    input, select {
-      background: var(--input);
-      border: 1px solid var(--line);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--focus);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 25%, transparent);
-    }
-
-    .actions {
+    .hud-top {
       display: flex;
-      flex-wrap: wrap;
+      justify-content: space-between;
       gap: 10px;
-      margin-top: 16px;
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
       font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      font-weight: 650;
+      text-shadow: 0 1px 4px rgba(0,0,0,.6);
     }
-
-    button:active { transform: translateY(1px); }
-
-    .btn-primary { background: var(--accent); color: #062218; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-secondary { background: #243746; color: var(--text); }
-    .btn-secondary:hover { background: #2d4558; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-danger:hover { background: var(--danger-hover); }
-    .btn-warn { background: var(--warn); color: #1a1400; }
-    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
+    .hud-top span { color: var(--accent); }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(4, 10, 18, 0.72);
+      backdrop-filter: blur(4px);
+      padding: 20px;
+      text-align: center;
+    }
+    .overlay.hidden { display: none; }
+    .card {
+      width: min(320px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 22px 18px;
+    }
+    .card h1 {
+      font-size: 1.7rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .card p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+    .card .scoreline {
+      color: var(--warn);
+      font-weight: 700;
       margin-bottom: 14px;
     }
-
-    .toolbar input {
-      flex: 1;
-      min-width: 180px;
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 18px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(180deg, #57dcff, #2bb8ea);
+      color: #042033;
+      min-width: 140px;
     }
-
-    .count {
+    button:active { transform: translateY(1px); }
+    .hint {
+      margin-top: 12px;
       color: var(--muted);
-      font-size: 0.85rem;
-      white-space: nowrap;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.92rem;
-      min-width: 640px;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    th {
-      background: #1a2d3d;
-      color: var(--muted);
-      font-weight: 600;
       font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: color-mix(in srgb, #1f3648 70%, transparent); }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 28px 12px;
-    }
-
-    .row-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      background: #1e3344;
-      border: 1px solid var(--line);
-      color: var(--text);
-      padding: 12px 16px;
-      border-radius: 8px;
-      opacity: 0;
-      transform: translateY(8px);
-      pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s;
-      z-index: 20;
-      max-width: min(320px, calc(100vw - 36px));
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media (max-width: 640px) {
-      .form-grid { grid-template-columns: 1fr; }
-      label.full { grid-column: auto; }
+      line-height: 1.45;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>学生管理系统</h1>
-      <p>本地浏览器保存，支持增删改查与搜索。</p>
-    </header>
-
-    <section class="panel">
-      <h2 id="formTitle">添加学生</h2>
-      <form id="studentForm">
-        <input type="hidden" id="editId" />
-        <div class="form-grid">
-          <label>
-            学号
-            <input id="studentId" name="studentId" required maxlength="32" placeholder="如 2024001" autocomplete="off" />
-          </label>
-          <label>
-            姓名
-            <input id="name" name="name" required maxlength="40" placeholder="学生姓名" autocomplete="off" />
-          </label>
-          <label>
-            性别
-            <select id="gender" name="gender" required>
-              <option value="男">男</option>
-              <option value="女">女</option>
-            </select>
-          </label>
-          <label>
-            班级
-            <input id="klass" name="klass" required maxlength="40" placeholder="如 计科2401" autocomplete="off" />
-          </label>
-          <label>
-            年龄
-            <input id="age" name="age" type="number" min="6" max="100" required placeholder="18" />
-          </label>
-          <label>
-            电话
-            <input id="phone" name="phone" maxlength="20" placeholder="选填" autocomplete="off" />
-          </label>
+  <div class="app">
+    <div class="stage">
+      <canvas id="game" width="420" height="700"></canvas>
+      <div class="hud">
+        <div class="hud-top">
+          <div>分数 <span id="score">0</span></div>
+          <div>生命 <span id="lives">3</span></div>
+          <div>最高 <span id="best">0</span></div>
         </div>
-        <div class="actions">
-          <button type="submit" class="btn-primary" id="submitBtn">添加</button>
-          <button type="button" class="btn-secondary" id="resetBtn">清空</button>
-          <button type="button" class="btn-warn" id="cancelEditBtn" hidden>取消编辑</button>
+      </div>
+      <div class="overlay" id="startOverlay">
+        <div class="card">
+          <h1>飞机大战</h1>
+          <p>操控战斗机消灭敌机。击落越多分越高，小心碰撞与子弹。</p>
+          <button id="startBtn" type="button">开始游戏</button>
+          <div class="hint">键盘：←→ / A D 移动，空格射击<br />触屏：拖动飞机，自动开火</div>
         </div>
-      </form>
-    </section>
-
-    <section class="panel">
-      <h2>学生列表</h2>
-      <div class="toolbar">
-        <input id="search" type="search" placeholder="搜索学号 / 姓名 / 班级 / 电话" />
-        <span class="count" id="countLabel">共 0 人</span>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>学号</th>
-              <th>姓名</th>
-              <th>性别</th>
-              <th>班级</th>
-              <th>年龄</th>
-              <th>电话</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
+      <div class="overlay hidden" id="overOverlay">
+        <div class="card">
+          <h1>游戏结束</h1>
+          <div class="scoreline">本局得分：<span id="finalScore">0</span></div>
+          <button id="restartBtn" type="button">再来一局</button>
+        </div>
       </div>
-    </section>
+    </div>
   </div>
 
-  <div class="toast" id="toast" role="status"></div>
-
   <script>
-    const STORAGE_KEY = "student_mgmt_v1";
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
 
-    /** @typedef {{ id: string, studentId: string, name: string, gender: string, klass: string, age: number, phone: string }} Student */
-
-    const els = {
-      form: document.getElementById("studentForm"),
-      formTitle: document.getElementById("formTitle"),
-      editId: document.getElementById("editId"),
-      studentId: document.getElementById("studentId"),
-      name: document.getElementById("name"),
-      gender: document.getElementById("gender"),
-      klass: document.getElementById("klass"),
-      age: document.getElementById("age"),
-      phone: document.getElementById("phone"),
-      submitBtn: document.getElementById("submitBtn"),
-      resetBtn: document.getElementById("resetBtn"),
-      cancelEditBtn: document.getElementById("cancelEditBtn"),
-      search: document.getElementById("search"),
-      countLabel: document.getElementById("countLabel"),
-      tbody: document.getElementById("tbody"),
-      toast: document.getElementById("toast"),
+    const ui = {
+      score: document.getElementById("score"),
+      lives: document.getElementById("lives"),
+      best: document.getElementById("best"),
+      finalScore: document.getElementById("finalScore"),
+      startOverlay: document.getElementById("startOverlay"),
+      overOverlay: document.getElementById("overOverlay"),
+      startBtn: document.getElementById("startBtn"),
+      restartBtn: document.getElementById("restartBtn"),
     };
 
-    /** @type {Student[]} */
-    let students = load();
-    let toastTimer = 0;
+    const BEST_KEY = "plane_war_best_v1";
+    let best = Number(localStorage.getItem(BEST_KEY) || 0);
+    ui.best.textContent = String(best);
 
-    function load() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return seed();
-        const data = JSON.parse(raw);
-        return Array.isArray(data) ? data : seed();
-      } catch {
-        return seed();
+    const keys = { left: false, right: false, shoot: false };
+    let running = false;
+    let lastTs = 0;
+    let score = 0;
+    let lives = 3;
+    let spawnTimer = 0;
+    let shootCooldown = 0;
+    let invuln = 0;
+    let stars = [];
+    let bullets = [];
+    let enemies = [];
+    let particles = [];
+    let player = null;
+
+    function resetGame() {
+      score = 0;
+      lives = 3;
+      spawnTimer = 0.6;
+      shootCooldown = 0;
+      invuln = 1.2;
+      bullets = [];
+      enemies = [];
+      particles = [];
+      player = {
+        x: W / 2,
+        y: H - 90,
+        w: 36,
+        h: 42,
+        speed: 320,
+      };
+      makeStars();
+      updateHud();
+    }
+
+    function makeStars() {
+      stars = Array.from({ length: 60 }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        s: 0.6 + Math.random() * 1.8,
+        v: 40 + Math.random() * 120,
+        a: 0.25 + Math.random() * 0.6,
+      }));
+    }
+
+    function updateHud() {
+      ui.score.textContent = String(score);
+      ui.lives.textContent = String(lives);
+      if (score > best) {
+        best = score;
+        localStorage.setItem(BEST_KEY, String(best));
+        ui.best.textContent = String(best);
       }
     }
 
-    function seed() {
-      const demo = [
-        { id: crypto.randomUUID(), studentId: "2024001", name: "张三", gender: "男", klass: "计科2401", age: 19, phone: "13800001111" },
-        { id: crypto.randomUUID(), studentId: "2024002", name: "李四", gender: "女", klass: "计科2401", age: 18, phone: "13900002222" },
-        { id: crypto.randomUUID(), studentId: "2024003", name: "王五", gender: "男", klass: "软工2402", age: 20, phone: "" },
-      ];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(demo));
-      return demo;
+    function startGame() {
+      resetGame();
+      running = true;
+      lastTs = 0;
+      ui.startOverlay.classList.add("hidden");
+      ui.overOverlay.classList.add("hidden");
+      requestAnimationFrame(loop);
     }
 
-    function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+    function gameOver() {
+      running = false;
+      ui.finalScore.textContent = String(score);
+      ui.overOverlay.classList.remove("hidden");
     }
 
-    function toast(msg) {
-      els.toast.textContent = msg;
-      els.toast.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2200);
+    function loop(ts) {
+      if (!running) return;
+      if (!lastTs) lastTs = ts;
+      let dt = (ts - lastTs) / 1000;
+      lastTs = ts;
+      if (dt > 0.05) dt = 0.05;
+      update(dt);
+      draw();
+      requestAnimationFrame(loop);
     }
 
-    function resetForm(keepEdit = false) {
-      els.form.reset();
-      els.gender.value = "男";
-      if (!keepEdit) {
-        els.editId.value = "";
-        els.formTitle.textContent = "添加学生";
-        els.submitBtn.textContent = "添加";
-        els.cancelEditBtn.hidden = true;
-        els.studentId.disabled = false;
+    function update(dt) {
+      for (const s of stars) {
+        s.y += s.v * dt;
+        if (s.y > H) {
+          s.y = -2;
+          s.x = Math.random() * W;
+        }
+      }
+
+      if (invuln > 0) invuln -= dt;
+      if (shootCooldown > 0) shootCooldown -= dt;
+
+      let vx = 0;
+      if (keys.left) vx -= 1;
+      if (keys.right) vx += 1;
+      player.x += vx * player.speed * dt;
+      player.x = Math.max(player.w / 2, Math.min(W - player.w / 2, player.x));
+
+      if ((keys.shoot || true) && shootCooldown <= 0) {
+        // continuous auto fire while playing; keyboard space also works as focus cue
+        bullets.push({
+          x: player.x,
+          y: player.y - player.h / 2,
+          w: 4,
+          h: 12,
+          speed: 560,
+        });
+        shootCooldown = 0.18;
+      }
+
+      bullets = bullets.filter((b) => {
+        b.y -= b.speed * dt;
+        return b.y + b.h > 0;
+      });
+
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnEnemy();
+        const pace = Math.max(0.28, 1.05 - score / 450);
+        spawnTimer = pace * (0.7 + Math.random() * 0.6);
+      }
+
+      for (const e of enemies) {
+        e.y += e.speed * dt;
+        e.x += Math.sin((e.y + e.phase) * 0.02) * e.sway * dt;
+        e.cooldown -= dt;
+        if (e.cooldown <= 0 && e.y > 40 && e.y < H * 0.72) {
+          bullets.push({
+            x: e.x,
+            y: e.y + e.h / 2,
+            w: 4,
+            h: 10,
+            speed: -280 - Math.min(120, score * 0.2),
+            enemy: true,
+          });
+          e.cooldown = 1.1 + Math.random() * 1.2;
+        }
+      }
+      enemies = enemies.filter((e) => e.y - e.h < H + 40);
+
+      // collisions: player bullets vs enemies
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const e = enemies[i];
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          const b = bullets[j];
+          if (b.enemy) continue;
+          if (hit(b, e)) {
+            bullets.splice(j, 1);
+            e.hp -= 1;
+            burst(e.x, e.y, "#ffd27a", 8);
+            if (e.hp <= 0) {
+              score += e.score;
+              burst(e.x, e.y, "#57dcff", 16);
+              enemies.splice(i, 1);
+              updateHud();
+            }
+            break;
+          }
+        }
+      }
+
+      // enemy bullets / body vs player
+      if (invuln <= 0) {
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          const b = bullets[j];
+          if (!b.enemy) continue;
+          if (hit(b, playerBox())) {
+            bullets.splice(j, 1);
+            damagePlayer();
+            break;
+          }
+        }
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          if (hit(enemies[i], playerBox())) {
+            burst(enemies[i].x, enemies[i].y, "#ff8a94", 14);
+            enemies.splice(i, 1);
+            damagePlayer();
+            break;
+          }
+        }
+      }
+
+      particles = particles.filter((p) => {
+        p.life -= dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 30 * dt;
+        return p.life > 0;
+      });
+    }
+
+    function playerBox() {
+      return { x: player.x, y: player.y, w: player.w * 0.7, h: player.h * 0.75 };
+    }
+
+    function damagePlayer() {
+      lives -= 1;
+      invuln = 1.4;
+      burst(player.x, player.y, "#ff5d6c", 20);
+      updateHud();
+      if (lives <= 0) gameOver();
+    }
+
+    function spawnEnemy() {
+      const kind = Math.random();
+      if (kind < 0.65) {
+        enemies.push({
+          x: 30 + Math.random() * (W - 60),
+          y: -30,
+          w: 34,
+          h: 34,
+          speed: 90 + Math.random() * 70 + Math.min(80, score * 0.15),
+          hp: 1,
+          score: 10,
+          sway: 20 + Math.random() * 40,
+          phase: Math.random() * 1000,
+          cooldown: 0.8 + Math.random(),
+          color: "#ff6b7a",
+        });
+      } else if (kind < 0.9) {
+        enemies.push({
+          x: 40 + Math.random() * (W - 80),
+          y: -40,
+          w: 46,
+          h: 40,
+          speed: 70 + Math.random() * 40 + Math.min(50, score * 0.1),
+          hp: 3,
+          score: 30,
+          sway: 10,
+          phase: Math.random() * 1000,
+          cooldown: 0.5 + Math.random() * 0.5,
+          color: "#ffb14a",
+        });
+      } else {
+        enemies.push({
+          x: 50 + Math.random() * (W - 100),
+          y: -50,
+          w: 58,
+          h: 48,
+          speed: 55 + Math.random() * 25,
+          hp: 6,
+          score: 60,
+          sway: 8,
+          phase: Math.random() * 1000,
+          cooldown: 0.35,
+          color: "#c084fc",
+        });
       }
     }
 
-    function enterEdit(student) {
-      els.editId.value = student.id;
-      els.studentId.value = student.studentId;
-      els.name.value = student.name;
-      els.gender.value = student.gender;
-      els.klass.value = student.klass;
-      els.age.value = String(student.age);
-      els.phone.value = student.phone || "";
-      els.formTitle.textContent = "编辑学生";
-      els.submitBtn.textContent = "保存修改";
-      els.cancelEditBtn.hidden = false;
-      els.studentId.disabled = true;
-      els.name.focus();
-    }
-
-    function getFiltered() {
-      const q = els.search.value.trim().toLowerCase();
-      if (!q) return students;
-      return students.filter((s) =>
-        [s.studentId, s.name, s.klass, s.phone].some((v) => String(v).toLowerCase().includes(q))
+    function hit(a, b) {
+      return (
+        Math.abs(a.x - b.x) < (a.w + b.w) / 2 &&
+        Math.abs(a.y - b.y) < (a.h + b.h) / 2
       );
     }
 
-    function render() {
-      const list = getFiltered();
-      els.countLabel.textContent = `共 ${list.length} 人` + (els.search.value.trim() ? `（全部 ${students.length}）` : "");
-
-      if (!list.length) {
-        els.tbody.innerHTML = `<tr><td colspan="7" class="empty">${students.length ? "没有匹配的学生" : "暂无学生，请先添加"}</td></tr>`;
-        return;
+    function burst(x, y, color, n) {
+      for (let i = 0; i < n; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const sp = 40 + Math.random() * 160;
+        particles.push({
+          x, y,
+          vx: Math.cos(ang) * sp,
+          vy: Math.sin(ang) * sp,
+          life: 0.25 + Math.random() * 0.45,
+          color,
+          size: 1.5 + Math.random() * 2.5,
+        });
       }
-
-      els.tbody.innerHTML = list
-        .map(
-          (s) => `
-        <tr>
-          <td>${escapeHtml(s.studentId)}</td>
-          <td>${escapeHtml(s.name)}</td>
-          <td>${escapeHtml(s.gender)}</td>
-          <td>${escapeHtml(s.klass)}</td>
-          <td>${s.age}</td>
-          <td>${escapeHtml(s.phone || "—")}</td>
-          <td>
-            <div class="row-actions">
-              <button type="button" class="btn-secondary btn-sm" data-edit="${s.id}">编辑</button>
-              <button type="button" class="btn-danger btn-sm" data-del="${s.id}">删除</button>
-            </div>
-          </td>
-        </tr>`
-        )
-        .join("");
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // stars
+      for (const s of stars) {
+        ctx.globalAlpha = s.a;
+        ctx.fillStyle = "#cfe8ff";
+        ctx.fillRect(s.x, s.y, s.s, s.s * 2.2);
+      }
+      ctx.globalAlpha = 1;
+
+      // bullets
+      for (const b of bullets) {
+        ctx.fillStyle = b.enemy ? "#ff7b88" : "#7ef0ff";
+        roundRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h, 2);
+        ctx.fill();
+      }
+
+      // enemies
+      for (const e of enemies) drawEnemy(e);
+
+      // player
+      if (player) {
+        const blink = invuln > 0 && Math.floor(invuln * 12) % 2 === 0;
+        if (!blink) drawPlayer(player);
+      }
+
+      // particles
+      for (const p of particles) {
+        ctx.globalAlpha = Math.max(0, p.life * 2);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
     }
 
-    els.form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const studentId = els.studentId.value.trim();
-      const name = els.name.value.trim();
-      const gender = els.gender.value;
-      const klass = els.klass.value.trim();
-      const age = Number(els.age.value);
-      const phone = els.phone.value.trim();
-      const editId = els.editId.value;
+    function drawPlayer(p) {
+      const x = p.x, y = p.y;
+      ctx.save();
+      ctx.translate(x, y);
+      // body
+      ctx.fillStyle = "#3ad0ff";
+      ctx.beginPath();
+      ctx.moveTo(0, -22);
+      ctx.lineTo(14, 16);
+      ctx.lineTo(0, 10);
+      ctx.lineTo(-14, 16);
+      ctx.closePath();
+      ctx.fill();
+      // cockpit
+      ctx.fillStyle = "#e8f7ff";
+      ctx.beginPath();
+      ctx.ellipse(0, -4, 4, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // wings
+      ctx.fillStyle = "#1f9ec8";
+      ctx.beginPath();
+      ctx.moveTo(-18, 4);
+      ctx.lineTo(-4, 0);
+      ctx.lineTo(-4, 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(18, 4);
+      ctx.lineTo(4, 0);
+      ctx.lineTo(4, 8);
+      ctx.closePath();
+      ctx.fill();
+      // engine glow
+      ctx.fillStyle = "#ffc857";
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.moveTo(-5, 12);
+      ctx.lineTo(0, 22 + Math.random() * 6);
+      ctx.lineTo(5, 12);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
 
-      if (!studentId || !name || !klass || !Number.isFinite(age)) {
-        toast("请完整填写必填项");
-        return;
-      }
+    function drawEnemy(e) {
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.fillStyle = e.color;
+      ctx.beginPath();
+      ctx.moveTo(0, 18);
+      ctx.lineTo(16, -14);
+      ctx.lineTo(0, -8);
+      ctx.lineTo(-16, -14);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
 
-      if (editId) {
-        const idx = students.findIndex((s) => s.id === editId);
-        if (idx < 0) {
-          toast("未找到要编辑的学生");
-          resetForm();
-          render();
-          return;
-        }
-        students[idx] = { ...students[idx], name, gender, klass, age, phone };
-        save();
-        resetForm();
-        render();
-        toast("已保存修改");
-        return;
-      }
+    function roundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
 
-      if (students.some((s) => s.studentId === studentId)) {
-        toast("学号已存在");
-        els.studentId.focus();
-        return;
-      }
-
-      students.unshift({
-        id: crypto.randomUUID(),
-        studentId,
-        name,
-        gender,
-        klass,
-        age,
-        phone,
-      });
-      save();
-      resetForm();
-      render();
-      toast("已添加学生");
-    });
-
-    els.resetBtn.addEventListener("click", () => {
-      if (els.editId.value) {
-        const current = students.find((s) => s.id === els.editId.value);
-        if (current) enterEdit(current);
-        else resetForm();
-      } else {
-        resetForm();
-      }
-    });
-
-    els.cancelEditBtn.addEventListener("click", () => {
-      resetForm();
-      toast("已取消编辑");
-    });
-
-    els.search.addEventListener("input", render);
-
-    els.tbody.addEventListener("click", (e) => {
-      const target = e.target;
-      if (!(target instanceof HTMLElement)) return;
-
-      const editId = target.getAttribute("data-edit");
-      if (editId) {
-        const student = students.find((s) => s.id === editId);
-        if (student) enterEdit(student);
-        return;
-      }
-
-      const delId = target.getAttribute("data-del");
-      if (delId) {
-        const student = students.find((s) => s.id === delId);
-        if (!student) return;
-        if (!confirm(`确认删除学生「${student.name}」（${student.studentId}）？`)) return;
-        students = students.filter((s) => s.id !== delId);
-        if (els.editId.value === delId) resetForm();
-        save();
-        render();
-        toast("已删除");
+    // input
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = true;
+      if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = true;
+      if (e.code === "Space") {
+        keys.shoot = true;
+        e.preventDefault();
       }
     });
+    window.addEventListener("keyup", (e) => {
+      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = false;
+      if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = false;
+      if (e.code === "Space") keys.shoot = false;
+    });
 
-    render();
+    let dragging = false;
+    canvas.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      canvas.setPointerCapture(e.pointerId);
+      moveToPointer(e);
+    });
+    canvas.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      moveToPointer(e);
+    });
+    canvas.addEventListener("pointerup", () => { dragging = false; });
+    canvas.addEventListener("pointercancel", () => { dragging = false; });
+
+    function moveToPointer(e) {
+      if (!player || !running) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * W;
+      player.x = Math.max(player.w / 2, Math.min(W - player.w / 2, x));
+    }
+
+    ui.startBtn.addEventListener("click", startGame);
+    ui.restartBtn.addEventListener("click", startGame);
+
+    // idle preview stars
+    makeStars();
+    (function idle() {
+      if (running) return;
+      ctx.clearRect(0, 0, W, H);
+      for (const s of stars) {
+        s.y += s.v * 0.016;
+        if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+        ctx.globalAlpha = s.a;
+        ctx.fillStyle = "#cfe8ff";
+        ctx.fillRect(s.x, s.y, s.s, s.s * 2.2);
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(idle);
+    })();
   </script>
 </body>
 </html>
