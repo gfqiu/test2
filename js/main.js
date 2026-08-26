@@ -92,14 +92,14 @@
       type: "项目",
       title: p.name,
       summary: p.summary,
-      href: `./project.html?id=${encodeURIComponent(p.id)}`,
+      href: `./project.html?id=${encodeURIComponent(p.id)}#${encodeURIComponent(p.id)}`,
       hay: `${p.name} ${p.summary} ${(p.stack || []).join(" ")}`.toLowerCase(),
     }));
     const notes = (SITE.notes || []).map((n) => ({
       type: "笔记",
       title: n.title,
       summary: n.summary,
-      href: `./note.html?id=${encodeURIComponent(n.id)}`,
+      href: `./note.html?id=${encodeURIComponent(n.id)}#${encodeURIComponent(n.id)}`,
       hay: `${n.title} ${n.summary} ${(n.tags || []).join(" ")}`.toLowerCase(),
     }));
     return [...projects, ...notes].filter((item) => item.hay.includes(q)).slice(0, 12);

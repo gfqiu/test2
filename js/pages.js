@@ -1,10 +1,15 @@
 (function () {
+  function noteHref(id) {
+    return `./note.html?id=${encodeURIComponent(id)}#${encodeURIComponent(id)}`;
+  }
+
   function noteCard(n) {
+    const href = noteHref(n.id);
     return `
       <article class="note-card" data-tags="${(n.tags || []).join(",").toLowerCase()}">
         <div class="body">
           <p class="muted">${n.date}</p>
-          <h3><a href="./note.html?id=${encodeURIComponent(n.id)}">${n.title}</a></h3>
+          <h3><a href="${href}">${n.title}</a></h3>
           <p class="muted">${n.summary}</p>
           <div class="tag-row">${(n.tags || [])
             .map((t) => `<span class="tag">${t}</span>`)
@@ -82,7 +87,10 @@
   async function initNoteDetail() {
     const root = document.querySelector("[data-note-detail]");
     if (!root || !window.SITE) return;
-    const id = new URLSearchParams(location.search).get("id");
+    const id =
+      new URLSearchParams(location.search).get("id") ||
+      decodeURIComponent((location.hash || "").replace(/^#/, "")) ||
+      null;
     const note = (SITE.notes || []).find((n) => n.id === id);
     if (!note) {
       root.innerHTML = `<div class="empty-state">未找到该笔记。<a href="./notes.html">返回列表</a></div>`;

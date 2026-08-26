@@ -3,18 +3,24 @@
     return (stack || []).map((s) => `<span class="tag">${s}</span>`).join("");
   }
 
+  function projectHref(id) {
+    // 同时兼容 ?id= 与 #id（避免部分静态服务器 cleanUrls 重定向丢失 query）
+    return `./project.html?id=${encodeURIComponent(id)}#${encodeURIComponent(id)}`;
+  }
+
   function projectCard(p) {
+    const href = projectHref(p.id);
     return `
       <article class="project-card" data-stack="${(p.stack || []).join(",").toLowerCase()}">
-        <a href="./project.html?id=${encodeURIComponent(p.id)}">
+        <a href="${href}">
           <img src="${p.thumb}" alt="${p.name} 缩略图" />
         </a>
         <div class="body">
-          <h3><a href="./project.html?id=${encodeURIComponent(p.id)}">${p.name}</a></h3>
+          <h3><a href="${href}">${p.name}</a></h3>
           <p class="muted">${p.summary}</p>
           <div class="tag-row">${stackChips(p.stack)}</div>
           <div class="detail-actions">
-            <a class="btn btn-ghost" href="./project.html?id=${encodeURIComponent(p.id)}">详情</a>
+            <a class="btn btn-ghost" href="${href}">详情</a>
             <a class="btn btn-ghost" href="${p.github}" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a class="btn btn-ghost" href="${p.demo}">预览</a>
           </div>
@@ -78,7 +84,10 @@
   function initProjectDetail() {
     const root = document.querySelector("[data-project-detail]");
     if (!root || !window.SITE) return;
-    const id = new URLSearchParams(location.search).get("id");
+    const id =
+      new URLSearchParams(location.search).get("id") ||
+      decodeURIComponent((location.hash || "").replace(/^#/, "")) ||
+      null;
     const project = (SITE.projects || []).find((p) => p.id === id);
     if (!project) {
       root.innerHTML = `<div class="empty-state">未找到该项目。<a href="./projects.html">返回列表</a></div>`;
