@@ -1,7 +1,7 @@
 (() => {
   const views = {
     si: {
-      title: "SiCl4 流量优化分析",
+      title: "SiCl4流量优化分析",
       unit: "sccm",
       base: 180,
       kpis: ["推荐均值", "波动幅度", "达标率", "节能收益"],
@@ -13,13 +13,13 @@
       kpis: ["目标温度", "热点温差", "均匀度", "能耗指数"],
     },
     ge: {
-      title: "GeCl4 流量优化分析",
+      title: "GeCl4流量优化分析",
       unit: "sccm",
       base: 42,
       kpis: ["推荐均值", "波动幅度", "达标率", "折射率匹配"],
     },
     o2: {
-      title: "O2 配比优化分析",
+      title: "O2配比优化分析",
       unit: "%",
       base: 28,
       kpis: ["最优配比", "氧化效率", "残氧率", "稳定性"],
@@ -53,7 +53,6 @@
     userMenu: document.getElementById("userMenu"),
     userBtn: document.getElementById("userBtn"),
     userDropdown: document.getElementById("userDropdown"),
-    contentBody: document.getElementById("contentBody"),
   };
 
   let currentView = "ge";
@@ -156,9 +155,6 @@
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    ctx.fillStyle = "rgba(0, 25, 50, 0.35)";
-    ctx.fillRect(0, 0, w, h);
-
     const padL = 42;
     const padR = 16;
     const padT = 18;
@@ -168,7 +164,7 @@
     const max = Math.max(...all) * 1.04;
     const n = recommend.length;
 
-    ctx.strokeStyle = "rgba(80, 160, 220, 0.25)";
+    ctx.strokeStyle = "#1a3d5c";
     ctx.lineWidth = 1;
     for (let i = 0; i < 5; i++) {
       const y = padT + ((h - padT - padB) * i) / 4;
@@ -177,12 +173,12 @@
       ctx.lineTo(w - padR, y);
       ctx.stroke();
       const val = max - ((max - min) * i) / 4;
-      ctx.fillStyle = "rgba(160, 200, 230, 0.7)";
+      ctx.fillStyle = "#7f9cb6";
       ctx.font = "11px sans-serif";
       ctx.fillText(val.toFixed(1), 4, y + 3);
     }
 
-    function path(arr, color, glow) {
+    function path(arr, color) {
       ctx.beginPath();
       arr.forEach((v, i) => {
         const x = padL + ((w - padL - padR) * i) / (n - 1);
@@ -191,24 +187,21 @@
         else ctx.lineTo(x, y);
       });
       ctx.strokeStyle = color;
-      ctx.lineWidth = 2.2;
-      ctx.shadowColor = glow;
-      ctx.shadowBlur = 10;
+      ctx.lineWidth = 1.8;
       ctx.stroke();
-      ctx.shadowBlur = 0;
     }
 
-    path(current, "rgba(255, 170, 90, 0.9)", "rgba(255, 160, 80, 0.45)");
-    path(recommend, "#5ce1ff", "rgba(0, 220, 255, 0.55)");
+    path(current, "#c4873a");
+    path(recommend, "#4a9ed4");
 
-    ctx.fillStyle = "rgba(180, 210, 235, 0.75)";
+    ctx.fillStyle = "#7f9cb6";
     ctx.font = "11px sans-serif";
     ctx.fillText("推荐", w - 90, 14);
-    ctx.fillStyle = "#5ce1ff";
+    ctx.fillStyle = "#4a9ed4";
     ctx.fillRect(w - 110, 6, 14, 3);
-    ctx.fillStyle = "rgba(180, 210, 235, 0.75)";
+    ctx.fillStyle = "#7f9cb6";
     ctx.fillText("当前", w - 40, 14);
-    ctx.fillStyle = "rgba(255, 170, 90, 0.9)";
+    ctx.fillStyle = "#c4873a";
     ctx.fillRect(w - 60, 6, 14, 3);
   }
 
@@ -217,8 +210,6 @@
     const w = canvas.width;
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "rgba(0, 25, 50, 0.35)";
-    ctx.fillRect(0, 0, w, h);
 
     const groups = 6;
     const padL = 28;
@@ -230,21 +221,17 @@
 
     for (let i = 0; i < groups; i++) {
       const x0 = padL + i * groupW;
-      const rh = ((recommend[i] / max) * (h - padT - padB));
-      const ch = ((current[i] / max) * (h - padT - padB));
+      const rh = (recommend[i] / max) * (h - padT - padB);
+      const ch = (current[i] / max) * (h - padT - padB);
       const bw = groupW * 0.28;
 
-      ctx.fillStyle = "rgba(0, 180, 255, 0.85)";
-      ctx.shadowColor = "rgba(0, 200, 255, 0.35)";
-      ctx.shadowBlur = 8;
+      ctx.fillStyle = "#2f7eb8";
       ctx.fillRect(x0 + groupW * 0.18, h - padB - rh, bw, rh);
 
-      ctx.fillStyle = "rgba(255, 160, 80, 0.8)";
-      ctx.shadowColor = "rgba(255, 160, 80, 0.25)";
+      ctx.fillStyle = "#b87a36";
       ctx.fillRect(x0 + groupW * 0.52, h - padB - ch, bw, ch);
-      ctx.shadowBlur = 0;
 
-      ctx.fillStyle = "rgba(160, 200, 230, 0.75)";
+      ctx.fillStyle = "#7f9cb6";
       ctx.font = "11px sans-serif";
       ctx.fillText(`T${pad(i + 1)}`, x0 + groupW * 0.3, h - 8);
     }
@@ -253,13 +240,11 @@
   function render() {
     const data = buildDataset();
     els.viewTitle.textContent = data.meta.title;
-    els.contentBody.style.animation = "none";
-    void els.contentBody.offsetWidth;
-    els.contentBody.style.animation = "";
 
     els.kpiRow.innerHTML = data.kpis
       .map(
-        (k) => `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`
+        (k) =>
+          `<div class="metric"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`
       )
       .join("");
 
@@ -286,14 +271,14 @@
 
   function setView(view) {
     currentView = view;
-    [...els.navList.querySelectorAll(".nav-item")].forEach((btn) => {
+    [...els.navList.querySelectorAll(".nav-btn")].forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.view === view);
     });
     render();
   }
 
   els.navList.addEventListener("click", (e) => {
-    const btn = e.target.closest(".nav-item");
+    const btn = e.target.closest(".nav-btn");
     if (!btn) return;
     setView(btn.dataset.view);
   });
@@ -310,7 +295,7 @@
       equipId: els.equipId.value,
       productCat: els.productCat.value,
     };
-    els.queryStatus.textContent = `已查询 ${query.startDate} ~ ${query.endDate}`;
+    els.queryStatus.textContent = `${query.startDate} ~ ${query.endDate}`;
     render();
     showToast("参数推荐已更新");
   });
@@ -363,6 +348,6 @@
     equipId: els.equipId.value,
     productCat: els.productCat.value,
   };
-  els.queryStatus.textContent = `已查询 ${query.startDate} ~ ${query.endDate}`;
+  els.queryStatus.textContent = `${query.startDate} ~ ${query.endDate}`;
   setView("ge");
 })();
