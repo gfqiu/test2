@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>岚图 · 企业数字化与云基础设施</title>
+  <meta name="description" content="岚图科技 — 为企业构建可信赖的数字化底座与云上能力。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #152028;
+      --ink-soft: #3a4a56;
+      --mist: #eef3f6;
+      --fog: #d2dde6;
+      --paper: #f7f9fb;
+      --teal: #1f6b74;
+      --teal-deep: #154e55;
+      --sand: #c9a882;
+      --white: #ffffff;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* —— Nav —— */
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem clamp(1.25rem, 4vw, 3.5rem);
+      mix-blend-mode: difference;
+      color: var(--white);
+      pointer-events: none;
+    }
+
+    .nav a { pointer-events: auto; }
+
+    .nav-brand {
+      font-family: "Noto Serif SC", serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.12em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+
+    .nav-links a { opacity: 0.85; transition: opacity 0.25s var(--ease); }
+    .nav-links a:hover { opacity: 1; }
+
+    /* —— Hero —— */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      color: var(--white);
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(21, 32, 40, 0.25) 0%, rgba(21, 32, 40, 0.55) 45%, rgba(21, 32, 40, 0.88) 100%),
+        linear-gradient(115deg, rgba(31, 107, 116, 0.35), transparent 55%),
+        url("assets/hero.png") center / cover no-repeat;
+      transform: scale(1.08);
+      animation: hero-drift 22s var(--ease) infinite alternate;
+    }
+
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.18;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: clamp(5rem, 12vw, 8rem) clamp(1.25rem, 4vw, 3.5rem) clamp(3rem, 7vw, 5rem);
+      max-width: 42rem;
+    }
+
+    .brand-mark {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(3.2rem, 9vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      line-height: 1.05;
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      transform: translateY(1.25rem);
+      animation: rise 1s var(--ease) 0.15s forwards;
+    }
+
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      line-height: 1.45;
+      margin-bottom: 0.85rem;
+      opacity: 0;
+      transform: translateY(1.25rem);
+      animation: rise 1s var(--ease) 0.35s forwards;
+    }
+
+    .hero p {
+      font-size: clamp(0.95rem, 2vw, 1.05rem);
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 28rem;
+      margin-bottom: 1.75rem;
+      opacity: 0;
+      transform: translateY(1.25rem);
+      animation: rise 1s var(--ease) 0.5s forwards;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      opacity: 0;
+      transform: translateY(1.25rem);
+      animation: rise 1s var(--ease) 0.65s forwards;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.45rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      border: 1px solid transparent;
+      transition: background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    .btn-primary:hover { background: var(--mist); }
+
+    .btn-ghost {
+      border-color: rgba(255, 255, 255, 0.45);
+      color: var(--white);
+      background: transparent;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* —— Sections —— */
+    section {
+      padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
+    }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.85rem;
+    }
+
+    .section-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.75rem, 4vw, 2.45rem);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      margin-bottom: 1rem;
+    }
+
+    .section-lead {
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      max-width: 36rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(1.5rem);
+      transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* —— About —— */
+    .about {
+      background:
+        radial-gradient(ellipse 80% 60% at 100% 0%, rgba(31, 107, 116, 0.08), transparent 55%),
+        linear-gradient(180deg, var(--mist), var(--paper));
+    }
+
+    .about-grid {
+      display: grid;
+      gap: 2.5rem;
+      margin-top: 2.75rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 800px) {
+      .about-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+        align-items: end;
+        gap: 4rem;
+      }
+    }
+
+    .about-copy p + p { margin-top: 1rem; }
+    .about-copy p { color: var(--ink-soft); }
+
+    .about-visual {
+      position: relative;
+      min-height: 280px;
+      background:
+        linear-gradient(160deg, rgba(21, 78, 85, 0.85), rgba(21, 32, 40, 0.55)),
+        url("assets/about.png") center / cover no-repeat;
+      overflow: hidden;
+    }
+
+    .about-visual::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 40%;
+      background: linear-gradient(transparent, rgba(21, 32, 40, 0.55));
+    }
+
+    .about-caption {
+      position: absolute;
+      left: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 1;
+      color: var(--white);
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* —— Services —— */
+    .services {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .services .eyebrow { color: var(--sand); }
+    .services .section-lead { color: rgba(255, 255, 255, 0.7); }
+
+    .service-list {
+      margin-top: 3rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .service-item {
+      display: grid;
+      gap: 0.75rem 2rem;
+      padding: 1.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      grid-template-columns: 1fr;
+      transition: padding-left 0.35s var(--ease);
+    }
+
+    .service-item:hover { padding-left: 0.5rem; }
+
+    @media (min-width: 700px) {
+      .service-item {
+        grid-template-columns: 3rem 12rem 1fr;
+        align-items: baseline;
+      }
+    }
+
+    .service-num {
+      font-family: "Noto Serif SC", serif;
+      color: var(--sand);
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+    }
+
+    .service-name {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .service-desc {
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 0.95rem;
+      max-width: 36rem;
+    }
+
+    /* —— Contact —— */
+    .contact {
+      background:
+        linear-gradient(135deg, rgba(201, 168, 130, 0.12), transparent 40%),
+        linear-gradient(180deg, var(--paper), var(--mist));
+    }
+
+    .contact-row {
+      display: grid;
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+
+    @media (min-width: 700px) {
+      .contact-row { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    }
+
+    .contact-block h3 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.65rem;
+    }
+
+    .contact-block p,
+    .contact-block a {
+      color: var(--ink-soft);
+      font-size: 0.98rem;
+    }
+
+    .contact-block a:hover { color: var(--teal); }
+
+    .contact-cta {
+      margin-top: 2.5rem;
+    }
+
+    .btn-solid {
+      background: var(--teal);
+      color: var(--white);
+    }
+
+    .btn-solid:hover { background: var(--teal-deep); }
+
+    /* —— Footer —— */
+    footer {
+      padding: 1.5rem clamp(1.25rem, 4vw, 3.5rem) 2rem;
+      border-top: 1px solid var(--fog);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--ink-soft);
+      font-size: 0.85rem;
+    }
+
+    footer strong {
+      font-family: "Noto Serif SC", serif;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes hero-drift {
+      from { transform: scale(1.08) translate(0, 0); }
+      to { transform: scale(1.14) translate(-1.5%, -1%); }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <a class="nav-brand" href="#top">岚图</a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#about">关于</a>
+      <a href="#services">能力</a>
+      <a href="#contact">联系</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="首页主视觉">
+      <div class="hero-bg" role="img" aria-label="云端与山峦交织的晨雾风景"></div>
+      <div class="hero-grain" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="brand-mark">岚图</p>
+        <h1>为企业构建可信赖的数字化底座</h1>
+        <p>从云基础设施到业务中台，我们帮团队把复杂系统做得清晰、稳固、可演进。</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#contact">预约沟通</a>
+          <a class="btn btn-ghost" href="#services">了解能力</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="section-inner">
+        <p class="eyebrow reveal">关于岚图</p>
+        <h2 class="section-title reveal">以工程之美，托起业务增长</h2>
+        <p class="section-lead reveal">我们是一家专注企业数字化与云基础设施的科技公司，长期服务制造、金融与零售行业的中大型团队。</p>
+        <div class="about-grid">
+          <div class="about-copy reveal">
+            <p>岚图相信：好的数字化不是堆砌工具，而是让组织、流程与系统同频。我们从架构设计出发，贯穿交付与运维，确保每一次上线都能沉淀为可复用的能力。</p>
+            <p>十余年来，我们陪伴客户完成核心系统现代化、多云迁移与数据平台建设，用克制的方案解决真实问题。</p>
+          </div>
+          <div class="about-visual reveal">
+            <span class="about-caption">清晰 · 稳固 · 可演进</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="services" id="services">
+      <div class="section-inner">
+        <p class="eyebrow reveal">核心能力</p>
+        <h2 class="section-title reveal">一条链路，贯通云与业务</h2>
+        <p class="section-lead reveal">不卖概念，只交付可运行、可观测、可交接的系统。</p>
+        <div class="service-list">
+          <article class="service-item reveal">
+            <span class="service-num">01</span>
+            <h3 class="service-name">云基础设施</h3>
+            <p class="service-desc">多云与混合云规划、容器平台与可观测体系，让算力与成本都可控。</p>
+          </article>
+          <article class="service-item reveal">
+            <span class="service-num">02</span>
+            <h3 class="service-name">业务中台</h3>
+            <p class="service-desc">统一身份、订单与主数据能力，缩短新产品上线周期。</p>
+          </article>
+          <article class="service-item reveal">
+            <span class="service-num">03</span>
+            <h3 class="service-name">数据智能</h3>
+            <p class="service-desc">从采集到指标看板，建立可信数据链路，支撑经营决策。</p>
+          </article>
+          <article class="service-item reveal">
+            <span class="service-num">04</span>
+            <h3 class="service-name">安全与合规</h3>
+            <p class="service-desc">零信任访问、审计留痕与等级保护实践，护航关键业务。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="section-inner">
+        <p class="eyebrow reveal">联系我们</p>
+        <h2 class="section-title reveal">下一步，从一次对话开始</h2>
+        <p class="section-lead reveal">告诉我们你的业务场景与现状，我们会在两个工作日内回复。</p>
+        <div class="contact-row">
+          <div class="contact-block reveal">
+            <h3>商务与合作</h3>
+            <p><a href="mailto:hello@lantu.tech">hello@lantu.tech</a></p>
+            <p>+86 021-5888 1200</p>
+          </div>
+          <div class="contact-block reveal">
+            <h3>办公地址</h3>
+            <p>上海市浦东新区世纪大道 100 号</p>
+            <p>岚图大厦 18 层</p>
+          </div>
+        </div>
+        <div class="contact-cta reveal">
+          <a class="btn btn-solid" href="mailto:hello@lantu.tech">发送邮件</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>岚图</strong>
+    <span>© 2026 岚图科技有限公司</span>
+  </footer>
+
+  <script>
+    const reveals = document.querySelectorAll(".reveal");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+    );
+    reveals.forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>
