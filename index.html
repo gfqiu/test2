@@ -4,159 +4,136 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>芯棒工艺优化参数推荐系统</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="hud-frame">
-    <div class="hud-corner tl"></div>
-    <div class="hud-corner tr"></div>
-    <div class="hud-corner bl"></div>
-    <div class="hud-corner br"></div>
-    <div class="hud-rail left"></div>
-    <div class="hud-rail right"></div>
-
-    <header class="top-bar">
-      <div class="logo-block">
-        <div class="logo-mark">
-          <svg viewBox="0 0 64 40" aria-hidden="true">
-            <ellipse cx="32" cy="20" rx="28" ry="16" fill="none" stroke="#3db4ff" stroke-width="2"/>
-            <ellipse cx="32" cy="20" rx="18" ry="10" fill="none" stroke="#7ad4ff" stroke-width="1.5"/>
-            <path d="M18 20c4-8 24-8 28 0M18 20c4 8 24 8 28 0" fill="none" stroke="#00d4ff" stroke-width="1.2"/>
-          </svg>
-          <span>HTGD</span>
-        </div>
-      </div>
-
-      <div class="title-plate">
-        <div class="title-wing left"></div>
-        <h1>芯棒工艺优化参数推荐系统</h1>
-        <div class="title-wing right"></div>
-      </div>
-
-      <div class="header-actions">
-        <button type="button" class="warn-btn" id="warnBtn">预警系统</button>
-        <div class="user-menu" id="userMenu">
-          <button type="button" class="user-btn" id="userBtn">
-            <span class="avatar"></span>
-            <span>testuser</span>
-            <span class="caret">▾</span>
-          </button>
-          <div class="user-dropdown" id="userDropdown">
-            <button type="button" data-action="profile">个人中心</button>
-            <button type="button" data-action="logout">退出登录</button>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <main class="workspace">
-      <aside class="sidebar">
-        <section class="panel input-panel">
-          <div class="panel-head">
-            <span class="deco">//////</span>
-            <h2>输入数据</h2>
-            <span class="deco">//////</span>
-          </div>
-          <form id="inputForm" class="input-form" autocomplete="off">
-            <label>
-              <span>开始时间</span>
-              <input type="date" id="startDate" name="startDate" required />
-            </label>
-            <label>
-              <span>结束时间</span>
-              <input type="date" id="endDate" name="endDate" required />
-            </label>
-            <label>
-              <span>沉积设备号</span>
-              <select id="equipId" name="equipId">
-                <option value="D-01">D-01</option>
-                <option value="D-02">D-02</option>
-                <option value="D-03">D-03</option>
-                <option value="D-04">D-04</option>
-              </select>
-            </label>
-            <label>
-              <span>产品类别</span>
-              <select id="productCat" name="productCat">
-                <option value="G.652D">G.652D</option>
-                <option value="G.657A2">G.657A2</option>
-                <option value="G.654E">G.654E</option>
-              </select>
-            </label>
-            <button type="submit" class="confirm-btn">确定</button>
-          </form>
-        </section>
-
-        <section class="panel nav-panel">
-          <div class="panel-head">
-            <span class="deco">//////</span>
-            <h2>参数推荐</h2>
-            <span class="deco">//////</span>
-          </div>
-          <nav class="nav-list" id="navList">
-            <button type="button" class="nav-item" data-view="si">SiCl4 流量优化分析</button>
-            <button type="button" class="nav-item" data-view="temp">芯棒温度场优化分析</button>
-            <button type="button" class="nav-item active" data-view="ge">GeCl4 流量优化分析</button>
-            <button type="button" class="nav-item" data-view="o2">O2 配比优化分析</button>
-            <button type="button" class="nav-item" data-view="speed">沉积速率优化分析</button>
-          </nav>
-        </section>
-      </aside>
-
-      <section class="content-panel panel">
-        <div class="content-head">
-          <h2 id="viewTitle">GeCl4 流量优化分析</h2>
-          <div class="status-pills">
-            <span class="pill online">在线</span>
-            <span class="pill" id="queryStatus">未查询</span>
-          </div>
+  <div class="app">
+    <div class="bezel">
+      <header class="header">
+        <div class="logo">
+          <span class="logo-ring" aria-hidden="true"></span>
+          <span class="logo-text">HTGD</span>
         </div>
 
-        <div class="content-body" id="contentBody">
-          <div class="kpi-row" id="kpiRow"></div>
-          <div class="chart-grid">
-            <div class="chart-card">
-              <div class="chart-title">推荐流量曲线</div>
-              <canvas id="trendChart" width="720" height="260"></canvas>
-            </div>
-            <div class="chart-card">
-              <div class="chart-title">参数对比</div>
-              <canvas id="barChart" width="420" height="260"></canvas>
+        <div class="title-bar">
+          <h1>芯棒工艺优化参数推荐系统</h1>
+        </div>
+
+        <div class="header-right">
+          <button type="button" class="btn-warn" id="warnBtn">预警系统</button>
+          <div class="user" id="userMenu">
+            <button type="button" class="btn-user" id="userBtn">
+              <span class="dot"></span>
+              testuser
+              <span class="arrow">▾</span>
+            </button>
+            <div class="dropdown" id="userDropdown">
+              <button type="button" data-action="profile">个人中心</button>
+              <button type="button" data-action="logout">退出登录</button>
             </div>
           </div>
-          <div class="table-wrap">
-            <table id="resultTable">
-              <thead>
-                <tr>
-                  <th>时段</th>
-                  <th>设备</th>
-                  <th>类别</th>
-                  <th>推荐流量 (sccm)</th>
-                  <th>当前流量</th>
-                  <th>偏差</th>
-                  <th>置信度</th>
-                  <th>建议</th>
-                </tr>
-              </thead>
-              <tbody id="resultBody"></tbody>
-            </table>
-          </div>
         </div>
-      </section>
-    </main>
+      </header>
+
+      <div class="layout">
+        <aside class="side">
+          <section class="box">
+            <h2 class="box-title">输入数据</h2>
+            <form id="inputForm" class="form" autocomplete="off">
+              <label>
+                <span>开始时间</span>
+                <input type="date" id="startDate" name="startDate" required />
+              </label>
+              <label>
+                <span>结束时间</span>
+                <input type="date" id="endDate" name="endDate" required />
+              </label>
+              <label>
+                <span>沉积设备号</span>
+                <select id="equipId" name="equipId">
+                  <option value="D-01">D-01</option>
+                  <option value="D-02">D-02</option>
+                  <option value="D-03">D-03</option>
+                  <option value="D-04">D-04</option>
+                </select>
+              </label>
+              <label>
+                <span>产品类别</span>
+                <select id="productCat" name="productCat">
+                  <option value="G.652D">G.652D</option>
+                  <option value="G.657A2">G.657A2</option>
+                  <option value="G.654E">G.654E</option>
+                </select>
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn-solid">确定</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="box nav-box">
+            <h2 class="box-title">参数推荐</h2>
+            <nav class="nav" id="navList">
+              <button type="button" class="nav-btn" data-view="si">SiCl4流量优化分析</button>
+              <button type="button" class="nav-btn" data-view="temp">芯棒温度场优化分析</button>
+              <button type="button" class="nav-btn active" data-view="ge">GeCl4流量优化分析</button>
+              <button type="button" class="nav-btn" data-view="o2">O2配比优化分析</button>
+              <button type="button" class="nav-btn" data-view="speed">沉积速率优化分析</button>
+            </nav>
+          </section>
+        </aside>
+
+        <section class="main box">
+          <div class="main-head">
+            <h2 id="viewTitle">GeCl4流量优化分析</h2>
+            <span class="meta" id="queryStatus">未查询</span>
+          </div>
+
+          <div class="main-body" id="contentBody">
+            <div class="metrics" id="kpiRow"></div>
+
+            <div class="charts">
+              <div class="chart-block">
+                <div class="chart-label">推荐流量曲线</div>
+                <canvas id="trendChart" width="720" height="260"></canvas>
+              </div>
+              <div class="chart-block">
+                <div class="chart-label">参数对比</div>
+                <canvas id="barChart" width="420" height="260"></canvas>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table id="resultTable">
+                <thead>
+                  <tr>
+                    <th>时段</th>
+                    <th>设备</th>
+                    <th>类别</th>
+                    <th>推荐流量 (sccm)</th>
+                    <th>当前流量</th>
+                    <th>偏差</th>
+                    <th>置信度</th>
+                    <th>建议</th>
+                  </tr>
+                </thead>
+                <tbody id="resultBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast" hidden></div>
-  <div class="modal" id="warnModal" hidden>
-    <div class="modal-card">
-      <div class="modal-head">
+  <div class="mask" id="warnModal" hidden>
+    <div class="dialog">
+      <div class="dialog-head">
         <h3>预警系统</h3>
-        <button type="button" class="modal-close" id="closeWarn">×</button>
+        <button type="button" class="btn-x" id="closeWarn">×</button>
       </div>
-      <ul class="warn-list" id="warnList"></ul>
+      <ul class="warns" id="warnList"></ul>
     </div>
   </div>
 
